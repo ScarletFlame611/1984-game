@@ -71,7 +71,6 @@ def menu(screen):
         for btn in btns_menu:
             if btn.is_mouse_on(x, y):
                 btn.mouse_on(screen)
-
     return True
 
 
