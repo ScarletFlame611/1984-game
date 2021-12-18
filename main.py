@@ -30,4 +30,5 @@ if __name__ == '__main__':
             if event.type == pygame.QUIT:
                 running = False
         pygame.display.flip()
+
     pygame.quit()
