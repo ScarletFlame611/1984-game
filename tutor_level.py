@@ -7,6 +7,8 @@ from fight import *
 size = width, height = 770, 420
 pygame.init()
 
+cd_step = 0  # кд шага(чтобы не спамило)
+CD_STEP = 20  # для того чтобы не менять кд в коде сделаем константу
 FPS = 60
 v = 4  # скорость игрока
 start_frame = time.time()
@@ -17,6 +19,8 @@ tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
 enemies_group = pygame.sprite.Group()  # группа для всех врагов на уровне
+step = pygame.mixer.Sound('data\step.mp3')  # звук шага
+pygame.mixer.music.load("data/level_music.mp3")  # музыка
 FIGHT = False
 
 
@@ -98,7 +102,8 @@ class Player(pygame.sprite.Sprite):
                 self.rect.move_ip([-i for i in coords])
             if pygame.sprite.spritecollideany(self, enemies_group):
                 FIGHT = True
-
+                pygame.mixer.music.load("data/fight.mp3")
+                pygame.mixer.music.play(-1)
         else:
             self.image = player_image if self.current_state == "right" else pygame.transform.flip(
                 player_image, True, False)
@@ -164,7 +169,7 @@ def show_groupes(screen):
 
 
 def game():
-    global FIGHT
+    global FIGHT, cd_step
     pygame.display.set_caption('Обучение')
     screen = pygame.display.set_mode((width, height))
     player, level_x, level_y = generate_level(load_level('level0.txt'))
@@ -175,6 +180,7 @@ def game():
     enemy1 = Enemy(100, 50)
     x_pos, y_pos = 0, 0
     clock = pygame.time.Clock()
+    pygame.mixer.music.play(-1)
     while True:
         screen.fill("black")
         for event in pygame.event.get():
@@ -190,6 +196,11 @@ def game():
         if not FIGHT:
             # движение игрока (передаются координаты сдвига и направление движения)
             keys = pygame.key.get_pressed()
+            if (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_UP] or keys[pygame.K_DOWN]) and not cd_step:
+                cd_step = CD_STEP
+                step.play()
+            elif cd_step:
+                cd_step -= 1
             if keys[pygame.K_LEFT]:
                 player.update([-v, 0], 1)
             elif keys[pygame.K_RIGHT]:
