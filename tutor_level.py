@@ -8,7 +8,7 @@ size = width, height = 770, 420
 pygame.init()
 
 cd_step = 0  # кд шага(чтобы не спамило)
-CD_STEP = 20  # для того чтобы не менять кд в коде сделаем константу
+CD_STEP = 30  # для того чтобы не менять кд в коде сделаем константу
 FPS = 60
 v = 4  # скорость игрока
 start_frame = time.time()
@@ -224,6 +224,8 @@ def game():
                 else:
                     # попытки выйти из боя и удалить врага
                     FIGHT = False
+                    pygame.mixer.music.load("data/level_music.mp3")
+                    pygame.mixer.music.play(-1)
                     enemy1.kill()
 
         enemy1.update()
