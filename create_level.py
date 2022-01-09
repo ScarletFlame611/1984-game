@@ -2,11 +2,10 @@ import pygame
 import os
 import sys
 import time
+import global_peremen
 
-size = width, height = 770, 420
 pygame.init()
 pygame.display.set_caption('Обучение')
-screen = pygame.display.set_mode((width, height))
 FPS = 60
 v = 4  # скорость игрока
 start_frame = time.time()
@@ -19,20 +18,13 @@ wall_group = pygame.sprite.Group()  # группа для остановки и�
 
 
 # загрузка изображения
-def load_image(name, colorkey=None):
-    fullname = os.path.join('data', name)
-    if not os.path.isfile(fullname):
-        print(f"Файл с изображением '{fullname}' не найден")
-        sys.exit()
-    image = pygame.image.load(fullname)
-    return image
 
 
 tile_images = {
-    'wall': load_image('box.png'),
-    'empty': load_image('floor.png')
+    'wall': global_peremen.load_image('box.png'),
+    'empty': global_peremen.load_image('floor.png')
 }
-player_image = load_image('player.png')
+player_image = global_peremen.load_image('player.png')
 
 tile_width = tile_height = 70
 
@@ -46,7 +38,7 @@ class Player(pygame.sprite.Sprite):
             tile_width * pos_x + 10, tile_height * pos_y + 5)
         self.frames = []
         for i in range(1, 9):
-            self.frames.append(load_image(f"run{i}.png"))
+            self.frames.append(global_peremen.load_image(f"run{i}.png"))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
 
@@ -95,7 +87,7 @@ class Border(pygame.sprite.Sprite):
 
 class level:
     def __init__(self, matrix_name, image_name, colorkey=0):
-        self.image = load_image(image_name, colorkey=colorkey)
+        self.image = global_peremen.load_image(image_name, colorkey=colorkey)
         self.level = self.load_level(matrix_name)
 
     def load_level(self, filename):
