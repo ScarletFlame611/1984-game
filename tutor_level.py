@@ -17,7 +17,6 @@ tiles_group = pygame.sprite.Group()
 player_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
 
-
 # генерация уровня
 def generate_level(level):
     new_player, x, y = None, None, None
@@ -63,7 +62,6 @@ player_image = load_image('player.png')
 
 tile_width = tile_height = 70
 
-
 # класс игрока
 class Player(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
@@ -71,22 +69,37 @@ class Player(pygame.sprite.Sprite):
         self.image = player_image
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 10, tile_height * pos_y + 5)
-        self.frames = []
+        self.runframes = []
+        self.goframes = []
         for i in range(1, 9):
-            self.frames.append(load_image(f"run{i}.png"))
+            self.runframes.append(load_image(f"run{i}.png"))
+        for i in range(1, 7):
+            self.goframes.append(load_image(f"go{i}.png"))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
 
     # передаются координаты сдвига игрока и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
     def update(self, coords, direction=0):
+        global amount_of_frames
         if direction != -1:
             self.rect.move_ip(coords)
-            self.cur_frame = int((time.time() - start_frame) * frames_per_second % amount_of_frames)
-            self.current_state = "right" if direction != 1 else "left"
-            # если изменилось направление движения - меняем текущее направление, куда смотрит игрок
-            self.image = self.frames[self.cur_frame] if direction == 0 else pygame.transform.flip(
-                self.frames[self.cur_frame], True, False)
+            if direction in (0, 1):
+                amount_of_frames = 8
+                self.cur_frame = int(
+                    (time.time() - start_frame) * frames_per_second % amount_of_frames)
+                self.current_state = "right" if direction != 1 else "left"
+                # если изменилось направление движения - меняем текущее направление,
+                # куда смотрит игрок
+                self.image = self.runframes[
+                    self.cur_frame] if direction == 0 else pygame.transform.flip(
+                    self.runframes[self.cur_frame], True, False)
+            else:
+                amount_of_frames = 6
+                self.cur_frame = int(
+                    (time.time() - start_frame) * frames_per_second % amount_of_frames)
+                self.image = self.goframes[
+                    self.cur_frame]
             if pygame.sprite.spritecollideany(self, wall_group):
                 # если произошло столкновение со стеной - перемещаем обратно
                 self.rect.move_ip([-i for i in coords])
@@ -142,9 +155,9 @@ def game():
         elif keys[pygame.K_RIGHT]:
             player.update([v, 0])
         elif keys[pygame.K_UP]:
-            player.update([0, -v])
+            player.update([0, -v], 3)
         elif keys[pygame.K_DOWN]:
-            player.update([0, v])
+            player.update([0, v], 2)
         else:
             player.update([0, 0], -1)
         screen.fill("black")
