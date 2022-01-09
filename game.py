@@ -1,8 +1,20 @@
 import pygame
+import create_level
+import menu
+import sys
+import global_peremen
 
 
-def start(screen):
-    screen.fill((10, 10, 10))
-    font = pygame.font.Font(None, 50)
-    font = font.render("Тут как бы игра начинается", True, (100, 100, 100))
-    screen.blit(font, (150, 180))
+if __name__ == '__main__':
+    pygame.display.set_caption('project')
+    while True:
+        global_peremen.screen.fill(pygame.Color(0, 0, 0))
+        events = pygame.event.get()
+        for event in events:
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+        if global_peremen.MOD == 'main_menu':
+            menu.menu.update(events)
+        global_peremen.clock.tick(global_peremen.fps)
+        pygame.display.update()

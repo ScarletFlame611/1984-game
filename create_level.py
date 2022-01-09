@@ -18,33 +18,6 @@ player_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
 
 
-# генерация уровня
-def generate_level(level):
-    new_player, x, y = None, None, None
-    for y in range(len(level)):
-        for x in range(len(level[y])):
-            if level[y][x] == '.':
-                Tile('empty', x, y)
-            elif level[y][x] == '#':
-                Tile('wall', x, y)
-            elif level[y][x] == '@':
-                Tile('empty', x, y)
-                new_player = Player(x, y)
-    return new_player, x, y
-
-
-# загрузка уровня
-def load_level(filename):
-    filename = "data/" + filename
-
-    with open(filename, 'r') as mapFile:
-        level_map = [line.strip() for line in mapFile]
-
-    max_width = max(map(len, level_map))
-
-    return list(map(lambda x: x.ljust(max_width, '.'), level_map))
-
-
 # загрузка изображения
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
@@ -120,18 +93,32 @@ class Border(pygame.sprite.Sprite):
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
 
-def terminate():
-    pygame.quit()
-    sys.exit()
+class level:
+    def __init__(self, matrix_name, image_name, colorkey=0):
+        self.image = load_image(image_name, colorkey=colorkey)
+        self.level = self.load_level(matrix_name)
 
+    def load_level(self, filename):
+        with open("data/" + filename, 'r') as mapFile:
+            level_map = [line.strip() for line in mapFile]
+        max_width = max(map(len, level_map))
+        return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
-def game():
-    player, level_x, level_y = generate_level(load_level('level0.txt'))
-    Border(0, 0, width, 0)
-    Border(0, height, width, height)
-    Border(0, 0, 0, height)
-    Border(width, 0, width, height)
-    while True:
+    def generate_level(self):
+        new_player, x, y = None, None, None
+        for y in range(len(self.level)):
+            for x in range(len(self.level[y])):
+                if level[y][x] == '.':
+                    Tile('empty', x, y)
+                elif level[y][x] == '#':
+                    Tile('wall', x, y)
+                elif level[y][x] == '@':
+                    Tile('empty', x, y)
+                    new_player = Player(x, y)
+        self.player = new_player
+        self.x, self.y = x, y
+
+    def play(self):
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 terminate()
@@ -152,8 +139,3 @@ def game():
         player_group.draw(screen)
         pygame.display.flip()
         clock.tick(FPS)
-
-
-if __name__ == "__main__":
-    clock = pygame.time.Clock()
-    game()
