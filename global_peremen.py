@@ -36,7 +36,7 @@ class Button:
     def render(self, screen, events):  # это, тип, обычные кнопочки
         pos = pygame.mouse.get_pos()
         for event in events:
-            if event.type == pygame.MOUSEBUTTONDOWN:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                     if self.is_mouse_on(*event.pos):
                         self.click_on()
         if self.image is not None:
@@ -67,3 +67,35 @@ class Button:
 
     def is_mouse_on(self, x, y):
         return self.x <= x <= self.x + self.w and self.y <= y <= self.y + self.h
+
+
+class Scroll:
+    def __init__(self, buttons, x, y):
+        self.buttons = buttons
+        self.x = x
+        self.y = y
+        self.step = WIDTH // 15
+        self.v = WIDTH // 5
+        past_x = 0
+        for i in range(len(self.buttons)):
+            self.buttons[i].x = past_x + self.step
+            self.buttons[i].y = self.y
+            past_x = self.buttons[i].x + self.buttons[i].w
+
+    def update(self, events):
+        for i in range(len(self.buttons)):
+            if self.buttons[i].x <= WIDTH:
+                self.buttons[i].render(screen, events)
+        for event in events:
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
+                max_ = max([elem.x + elem.h for elem in self.buttons])
+                width = [elem.w for elem in self.buttons if elem.x + elem.h == max_][0]
+                if max_ - self.v > WIDTH - width - self.v:
+                    for i in range(len(self.buttons)):
+                        self.buttons[i].x -= self.v
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
+                min_ = min([elem.x for elem in self.buttons])
+                width = [elem.w for elem in self.buttons if elem.x == min_][0]
+                if min_ + self.v < width + self.v:
+                    for i in range(len(self.buttons)):
+                        self.buttons[i].x += self.v
