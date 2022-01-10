@@ -18,6 +18,6 @@ if __name__ == '__main__':
         if global_peremen.MOD == 'main_menu':
             menu.menu.update(events)
         if global_peremen.MOD == 'in_game_menu':
-            in_game_menu.in_game_menu.update()
+            in_game_menu.in_game_menu.update(events)
         global_peremen.clock.tick(global_peremen.fps)
         pygame.display.update()
