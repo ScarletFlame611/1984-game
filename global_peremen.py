@@ -74,9 +74,15 @@ class Scroll:
         self.buttons = buttons
         self.x = x
         self.y = y
-        self.step = WIDTH // 15
+        self.step = WIDTH // 30
         self.v = WIDTH // 5
         past_x = 0
+        self.buttons = []
+        for char in buttons:
+            if len(char) > 2:
+                self.buttons.append(Button(char[0], x, y, char[1], name_image=char[2], size=char[3]))
+            else:
+                self.buttons.append(Button(char[0], x, y, char[1]))
         for i in range(len(self.buttons)):
             self.buttons[i].x = past_x + self.step
             self.buttons[i].y = self.y
@@ -89,13 +95,11 @@ class Scroll:
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 4:
                 max_ = max([elem.x + elem.h for elem in self.buttons])
-                width = [elem.w for elem in self.buttons if elem.x + elem.h == max_][0]
-                if max_ - self.v > WIDTH - width - self.v:
+                if max_ - self.v > WIDTH - self.v:
                     for i in range(len(self.buttons)):
                         self.buttons[i].x -= self.v
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 5:
                 min_ = min([elem.x for elem in self.buttons])
-                width = [elem.w for elem in self.buttons if elem.x == min_][0]
-                if min_ + self.v < width + self.v:
+                if min_ + self.v < self.v:
                     for i in range(len(self.buttons)):
                         self.buttons[i].x += self.v
