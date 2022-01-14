@@ -184,7 +184,7 @@ class Coin(pygame.sprite.Sprite):
             self.remove(bonus_group)
 
 
-class level:
+class Level:
     def __init__(self, matrix_name, colorkey=0):
         self.level = self.load_level(matrix_name)
         self.mouse_x, self.mouse_y = None, None

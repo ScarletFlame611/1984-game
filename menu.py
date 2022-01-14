@@ -15,14 +15,14 @@ class Menu:
             btn.render(global_peremen.screen, events)
 
     def new_game(self):
-        global_peremen.MOD = 'in_game_menu'
+        global_peremen.MOD = 'name_input'
 
     def close(self):
         pygame.quit()
         sys.exit()
 
     def continuee(self):
-        pass
+        global_peremen.MOD = 'in_game_menu'
 '''
     def btn_continue(self, screen):
         global x, y

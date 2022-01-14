@@ -1,5 +1,5 @@
 import pygame, os
-import sys
+import sys, random
 
 pygame.init()
 clock = pygame.time.Clock()
@@ -7,6 +7,14 @@ fps = 60
 MOD = 'main_menu'
 SIZE = WIDTH, HIGH = 900, 500
 screen = pygame.display.set_mode(SIZE)
+font = pygame.font.Font(None, HIGH // 10)
+name = ''
+enter_nam = None
+keys_to_normal = {}
+names = [str(i) for i in range(0, 10)]
+keys = [i for i in range(48, 58)]
+for i in range(len(keys)):
+    keys_to_normal[keys[i]] = names[i]
 
 
 def load_image(name, colorkey=None):
@@ -19,14 +27,14 @@ def load_image(name, colorkey=None):
 
 
 class Button:
-    def __init__(self, text, x, y, function, name_image=None, size=None):  # текст и координаты считывает
-        font = pygame.font.Font(None, 50)
+    def __init__(self, text, x, y, function, name_image=None, size=None, clicable=True):  # текст и координаты считывает
         self.text = text
         self.font_light = font.render(text, True, (100, 255, 255))
         self.font = font.render(text, True, (100, 100, 100))
         self.size = self.w, self.h = self.font.get_width() + 10, self.font.get_height() + 10
         self.cords = self.x, self.y = x - self.font.get_width() // 2, y
         self.function = function
+        self.clicable = clicable
         if name_image is not None:
             self.image = pygame.transform.scale(load_image(name_image, colorkey=-1), size)
             self.size = self.w, self.h = size[0], size[1]
@@ -64,7 +72,8 @@ class Button:
         screen.blit(self.font_light, (self.x, self.y))
 
     def click_on(self):  # это на случай, если мы тыкнем на кнопочку ._.
-        self.function()
+        if self.clicable:
+            self.function()
 
     def is_mouse_on(self, x, y):
         return self.x <= x <= self.x + self.w and self.y <= y <= self.y + self.h
@@ -104,3 +113,55 @@ class Scroll:
                 if min_ + self.v < self.v:
                     for i in range(len(self.buttons)):
                         self.buttons[i].x += self.v
+
+
+class Name_input:
+    def __init__(self, poz, size, random_name_button, max_count_symbols):
+        print(poz)
+        self.mod = 0
+        self.x, self.y = poz[0], poz[1]
+        self.text_input = Button('', *poz, None, clicable=False)
+        self.text_input.size = self.text_input.w, self.text_input.h = size
+        self.max_count_symbols = max_count_symbols
+        self.min_size = size
+        self.continue_button = Button('Continue', self.x, self.y + self.text_input.h, self.success)
+        if random_name_button:
+            self.random_name_button = Button('random_name', self.text_input.w + self.x + self.text_input.w, self.y + self.text_input.h, self.create_random_name)
+            self.random_name_button.x = self.text_input.w + self.x - self.random_name_button.w
+            self.continue_button.x = self.random_name_button.x - self.continue_button.w
+        else:
+            self.random_name_button = None
+            self.continue_button.x = self.text_input.w + self.x - self.random_name_button.w
+
+    def create_random_name(self, symbols='фбвгдеёжзийклмнопрстуфхцчшщъыьэюяabsdefghijklmnopqrstuvwxyz1234567890', counts=(5, 10)):
+        name = ''
+        for _ in range(random.randint(*counts)):
+            name += random.choice(symbols)
+        self.text_input.text = name
+        self.text_input.font_light = font.render(self.text_input.text, True, (100, 255, 255))
+        self.text_input.font = font.render(self.text_input.text, True, (100, 100, 100))
+        self.text_input.size = self.text_input.w, self.text_input.h = self.text_input.font.get_width() + 10, self.text_input.font.get_height() + 10
+        self.resize()
+
+    def resize(self):
+        if self.text_input.font.get_width() + 10 < self.min_size[0]:
+            self.text_input.size = self.text_input.w, self.text_input.h = self.min_size
+        self.random_name_button.x = self.text_input.w + self.x - self.random_name_button.w
+
+    def update(self, events):
+        self.text_input.render(screen, events)
+        self.continue_button.render(screen, events)
+        if self.random_name_button is not None:
+            self.random_name_button.render(screen, events)
+
+    def success(self):
+        global name, enter_nam, MOD
+        if self.text_input.text != '':
+            name = self.text_input.text
+            enter_nam = None
+            MOD = 'in_game_menu'
+
+
+def enter_name(poz, size, random_name_button=True, max_count_symbols=10):
+    global enter_nam
+    enter_nam = Name_input(poz, size, random_name_button, max_count_symbols)
