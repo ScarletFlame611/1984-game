@@ -1,4 +1,4 @@
-import global_peremen, saves
+import global_peremen, saves, in_game_menu
 
 
 class Choice_menu:
@@ -30,5 +30,6 @@ class Choice_menu:
             global_peremen.WIDTH, global_peremen.HIGH = int(sav[0]), int(sav[1])
             global_peremen.MOD = 'in_game_menu'
             global_peremen.choice_menu = None
+            global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
         else:
             print('нету такого сохранения')

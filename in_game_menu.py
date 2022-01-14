@@ -41,6 +41,3 @@ class In_game_menu:
 
     def open_level(self):
         global_peremen.MOD = "level" + str(1)
-
-
-in_game_menu = In_game_menu('bg.png', 'player.png', 'map.png')

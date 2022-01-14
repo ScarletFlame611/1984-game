@@ -2,6 +2,7 @@ import pygame
 import global_peremen
 import sys
 import saves
+import in_game_menu
 
 
 class Menu:
@@ -17,6 +18,7 @@ class Menu:
 
     def new_game(self):
         global_peremen.MOD = 'name_input'
+        global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
 
     def close(self):
         pygame.quit()

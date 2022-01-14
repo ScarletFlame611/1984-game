@@ -11,6 +11,7 @@ import choice_menu
 
 if __name__ == '__main__':
     pygame.display.set_caption('project')
+    global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
     while True:
         global_peremen.screen.fill(pygame.Color(0, 0, 0))
         events = pygame.event.get()
@@ -21,7 +22,7 @@ if __name__ == '__main__':
         if global_peremen.MOD == 'main_menu':
             menu.menu.update(events)
         if global_peremen.MOD == 'in_game_menu':
-            in_game_menu.in_game_menu.update(events)
+            global_peremen.in_game_menu.update(events)
         if "level" in global_peremen.MOD:
             number = global_peremen.MOD[-1]
             name_level = "level" + number
