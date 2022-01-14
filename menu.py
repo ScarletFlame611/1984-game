@@ -1,6 +1,7 @@
 import pygame
 import global_peremen
 import sys
+import saves
 
 
 class Menu:
@@ -22,7 +23,8 @@ class Menu:
         sys.exit()
 
     def continuee(self):
-        global_peremen.MOD = 'in_game_menu'
+        global_peremen.MOD = 'choice_menu'
+
 '''
     def btn_continue(self, screen):
         global x, y

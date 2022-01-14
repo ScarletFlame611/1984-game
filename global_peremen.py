@@ -7,14 +7,9 @@ fps = 60
 MOD = 'main_menu'
 SIZE = WIDTH, HIGH = 900, 500
 screen = pygame.display.set_mode(SIZE)
-font = pygame.font.Font(None, HIGH // 10)
-name = ''
+font = pygame.font.Font(None, min(SIZE) // 10)
+NAME = ''
 enter_nam = None
-keys_to_normal = {}
-names = [str(i) for i in range(0, 10)]
-keys = [i for i in range(48, 58)]
-for i in range(len(keys)):
-    keys_to_normal[keys[i]] = names[i]
 
 
 def load_image(name, colorkey=None):
@@ -27,7 +22,7 @@ def load_image(name, colorkey=None):
 
 
 class Button:
-    def __init__(self, text, x, y, function, name_image=None, size=None, clicable=True):  # текст и координаты считывает
+    def __init__(self, text, x, y, function, name_image=None, size=None, clicable=True, function_peremen=None):  # текст и координаты считывает
         self.text = text
         self.font_light = font.render(text, True, (100, 255, 255))
         self.font = font.render(text, True, (100, 100, 100))
@@ -35,14 +30,18 @@ class Button:
         self.cords = self.x, self.y = x - self.font.get_width() // 2, y
         self.function = function
         self.clicable = clicable
+        self.cd = 30
         if name_image is not None:
             self.image = pygame.transform.scale(load_image(name_image, colorkey=-1), size)
             self.size = self.w, self.h = size[0], size[1]
         else:
             self.image = None
+        self.function_peremen = function_peremen
         # а размер под текст настривает
 
     def render(self, screen, events):  # это, тип, обычные кнопочки
+        if self.cd != 0:
+            self.cd -= 1
         pos = pygame.mouse.get_pos()
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
@@ -72,8 +71,11 @@ class Button:
         screen.blit(self.font_light, (self.x, self.y))
 
     def click_on(self):  # это на случай, если мы тыкнем на кнопочку ._.
-        if self.clicable:
-            self.function()
+        if self.clicable and not self.cd:
+            if self.function_peremen is None:
+                self.function()
+            else:
+                self.function(*self.function_peremen)
 
     def is_mouse_on(self, x, y):
         return self.x <= x <= self.x + self.w and self.y <= y <= self.y + self.h
@@ -89,8 +91,10 @@ class Scroll:
         past_x = 0
         self.buttons = []
         for char in buttons:
-            if len(char) > 2:
+            if len(char) > 3:
                 self.buttons.append(Button(char[0], x, y, char[1], name_image=char[2], size=char[3]))
+            elif len(char) == 3:
+                self.buttons.append(Button(char[0], x, y, char[1], function_peremen=[char[2]]))
             else:
                 self.buttons.append(Button(char[0], x, y, char[1]))
         for i in range(len(self.buttons)):
@@ -155,9 +159,9 @@ class Name_input:
             self.random_name_button.render(screen, events)
 
     def success(self):
-        global name, enter_nam, MOD
+        global NAME, enter_nam, MOD
         if self.text_input.text != '':
-            name = self.text_input.text
+            NAME = self.text_input.text
             enter_nam = None
             MOD = 'in_game_menu'
 

@@ -1,4 +1,4 @@
-import global_peremen, pygame
+import global_peremen, pygame, saves
 
 
 class In_game_menu:
@@ -7,8 +7,15 @@ class In_game_menu:
         self.hero = global_peremen.Button('', global_peremen.WIDTH // 2 - (global_peremen.WIDTH // 14), global_peremen.HIGH // 2 - (global_peremen.HIGH // 6), self.dont_touch, name_image=hero_image_name, size=(global_peremen.WIDTH // 7, global_peremen.HIGH // 3))
         self.map = global_peremen.Button('', global_peremen.WIDTH - (global_peremen.WIDTH // 5), global_peremen.HIGH - (global_peremen.HIGH // 5), self.open_mup, name_image=map_image_name, size=(global_peremen.WIDTH // 5, global_peremen.HIGH // 5))
         self.scroll = global_peremen.Scroll([('1', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('click me pls', self.open_mup,)], 20, 100)
+        self.save = global_peremen.Button('save', 0, 0, saves.save)
+        self.close = global_peremen.Button('close', 0 + self.save.w, 0, self.close)
         self.mod = 'menu'
         self.dont_touch_cd = 0
+        text = "don't touch me!"
+        self.font = global_peremen.font.render(text, True, (255, 255, 255))
+
+    def close(self):
+        global_peremen.mod = 'main_menu'
 
     def update(self, events):
         if self.mod == 'menu':
@@ -16,11 +23,9 @@ class In_game_menu:
             self.hero.render(global_peremen.screen, events)
             self.map.render(global_peremen.screen, events)
             if self.dont_touch_cd:
-                text = "don't touch me!"
-                font = pygame.font.Font(None, 50)
-                font = font.render(text, True, (255, 255, 255))
-                global_peremen.screen.blit(font, (self.hero.x + (font.get_width() // 2), self.hero.y + (font.get_height() // 2)))
+                global_peremen.screen.blit(self.font, (self.hero.x + (self.font.get_width() // 2), self.hero.y + (self.font.get_height() // 2)))
                 self.dont_touch_cd -= 1
+            global_peremen.screen.blit(global_peremen.font.render(global_peremen.NAME, True, (100, 100, 100)), (0, 0))
         elif self.mod == 'map':
             self.scroll.update(events)
 
