@@ -36,7 +36,9 @@ if __name__ == '__main__':
                 global_peremen.enter_name(((global_peremen.WIDTH // 2) - (global_peremen.WIDTH // 4), global_peremen.HIGH // 2 - global_peremen.HIGH // 20), (global_peremen.WIDTH // 2, global_peremen.HIGH // 10))
             global_peremen.enter_nam.update(events)
         if global_peremen.MOD == 'choice_menu':
-            choice_menu.choice_menu.update(events)
+            if global_peremen.choice_menu is None:
+                global_peremen.choice_menu = choice_menu.Choice_menu()
+            global_peremen.choice_menu.update(events)
         global_peremen.clock.tick(global_peremen.fps)
         pygame.display.update()
 

@@ -29,8 +29,6 @@ class Choice_menu:
             global_peremen.NAME = sav[-1][:-1]
             global_peremen.WIDTH, global_peremen.HIGH = int(sav[0]), int(sav[1])
             global_peremen.MOD = 'in_game_menu'
+            global_peremen.choice_menu = None
         else:
             print('нету такого сохранения')
-
-
-choice_menu = Choice_menu()

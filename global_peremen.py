@@ -10,6 +10,7 @@ screen = pygame.display.set_mode(SIZE)
 font = pygame.font.Font(None, min(SIZE) // 10)
 NAME = ''
 enter_nam = None
+choice_menu = None
 
 
 def load_image(name, colorkey=None):
