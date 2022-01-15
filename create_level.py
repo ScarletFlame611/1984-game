@@ -17,9 +17,9 @@ player_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
 bonus_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
-
+borders_group = pygame.sprite.Group()
 coins = pygame.sprite.Group()
-
+for_open = pygame.sprite.Group()
 # загрузка изображения
 
 
@@ -49,6 +49,8 @@ class Player(pygame.sprite.Sprite):
         self.current_state = "right"  # текущее направление, куда смотрит игрок
         self.hp = 150
         self.score = 0
+        self.keys = 0
+        self.instruments = 0
 
     # передаются координаты сдвига игрока и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
@@ -72,14 +74,19 @@ class Player(pygame.sprite.Sprite):
                     (time.time() - start_frame) * frames_per_second % amount_of_frames)
                 self.image = self.goframes[
                     self.cur_frame]
-            if pygame.sprite.spritecollideany(self, wall_group):
-                # если произошло столкновение со стеной - перемещаем обратно
-                self.rect.move_ip([-i for i in coords])
             hits = pygame.sprite.spritecollide(self, bonus_group, False)
             if hits:
                 for sprite in hits:
                     if pygame.sprite.collide_rect(sprite, sprite):
                         sprite.buff(self)
+            hits = pygame.sprite.spritecollide(self, for_open, False)
+            if hits:
+                for sprite in hits:
+                    if pygame.sprite.collide_rect(sprite, sprite):
+                        sprite.open(self)
+            if pygame.sprite.spritecollideany(self, wall_group):
+                # если произошло столкновение со стеной - перемещаем обратно
+                self.rect.move_ip([-i for i in coords])
             enemy = pygame.sprite.spritecollide(self, enemies_group, False)
             if enemy:
                 for sprite in enemy:
@@ -109,7 +116,8 @@ class Enemy(pygame.sprite.Sprite):
         if self.current_state == "right":
             self.image = global_peremen.load_image(f"enemy/idle1.png")
         else:
-            self.image = pygame.transform.flip(global_peremen.load_image(f"enemy/idle1.png"), True, False)
+            self.image = pygame.transform.flip(global_peremen.load_image(f"enemy/idle1.png"), True,
+                                               False)
 
 
 # класс плиток
@@ -129,10 +137,12 @@ class Border(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         if x1 == x2:
             self.add(wall_group)
+            self.add(borders_group)
             self.image = pygame.Surface([1, y2 - y1])
             self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
         else:
             self.add(wall_group)
+            self.add(borders_group)
             self.image = pygame.Surface([x2 - x1, 1])
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
@@ -215,7 +225,25 @@ class level:
                 elif self.level[y][x] == "&":
                     Tile('empty', x, y)
                     Enemy(x, y)
+                elif self.level[y][x] == ">":
+                    Speed_Up(x, y)
+                elif self.level[y][x] == "<":
+                    Speed_Down(x, y)
+                elif self.level[y][x] == "<":
+                    Speed_Down(x, y)
+                elif self.level[y][x] == "k":
+                    Tile('empty', x, y)
+                    Key(x, y)
+                elif self.level[y][x] == "i":
+                    Tile('empty', x, y)
+                    Instrument(x, y)
+                elif self.level[y][x] == "?":
+                    Safe(x, y)
+                elif self.level[y][x] == "!":
+                    Panel(x, y)
         self.player = player
+        self.width = len(self.level[0]) * tile_width
+        self.height = len(self.level) * tile_height
         self.x, self.y = x, y
 
     def play(self):
@@ -252,9 +280,15 @@ class level:
         if global_peremen.MOD == "fight_start":
             fight = Fight(self.player)
             fight.update()
+        Border(0, 0, self.width, 0)
+        Border(0, self.height, self.width, self.height)
+        Border(0, 0, 0, self.height)
+        Border(self.width, 0, self.width, self.height)
         enemies_group.draw(global_peremen.screen)
         player_group.draw(global_peremen.screen)
+        borders_group.draw(global_peremen.screen)
         ui.draw_bar(global_peremen.screen, 10, 10, self.player.hp)
+        ui.show_scores(global_peremen.screen, global_peremen.WIDTH - 150, 10, self.player.score)
         pygame.display.flip()
         global_peremen.clock.tick(FPS)
 
@@ -324,7 +358,10 @@ class Fight:
 
     def is_path(self, x, y):
         if x + 1 <= self.w and y + 1 <= self.h:
-            path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)[y][x]
+            path = \
+                self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h,
+                              self.lab)[
+                    y][x]
             if path <= self.player_count:
                 return True
         return False
@@ -346,6 +383,104 @@ class Fight:
         return lab
 
 
+class Key(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('key.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 20, tile_height * pos_y + 15)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.keys += 1
+            self.used = True
+            self.remove(bonus_group)
+            self.remove(all_sprites)
+
+
+class Instrument(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('key2.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 20, tile_height * pos_y + 15)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.instruments += 1
+            self.used = True
+            self.remove(bonus_group)
+            self.remove(all_sprites)
+
+
+class Panel(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(for_open)
+        self.image = global_peremen.load_image('broken_panel.jpg')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def open(self, other):
+        if other.instruments > 0 and not self.used:
+            self.used = True
+            other.score += 100
+            other.instruments -= 1
+            self.image = global_peremen.load_image('panel.jpg')
+
+
+class Safe(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(for_open)
+        self.add(wall_group)
+        self.image = global_peremen.load_image('Safe.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def open(self, other):
+        if other.keys > 0 and not self.used:
+            self.used = True
+            other.score += 100
+            other.keys -= 1
+            self.image = global_peremen.load_image('Safe1.png')
+
+
+class Speed_Up(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(bonus_group)
+        self.image = global_peremen.load_image('fast.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def buff(self, other):
+        global v
+        if not self.used:
+            v += 1
+            self.used = True
+
+
+class Speed_Down(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(bonus_group)
+        self.image = global_peremen.load_image('slow.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def buff(self, other):
+        global v
+        if not self.used:
+            v -= 1
+            self.used = True
+
 
 class UI:
     def draw_skills(self):
@@ -363,3 +498,11 @@ class UI:
         fill_rect = pygame.Rect(x, y, fill, bar_height)
         pygame.draw.rect(surf, pygame.Color("green"), fill_rect)
         pygame.draw.rect(surf, pygame.Color("white"), outline_rect, 2)
+
+    def show_scores(self, surf, x, y, scores):
+        pygame.font.init()
+        f = pygame.font.Font(None, 36)
+        text = f.render(f'Scores: {scores}', True,
+                        (255, 255, 255))
+        surf.blit(text, (x, y))
+        pygame.display.update()
