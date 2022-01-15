@@ -7,12 +7,14 @@ import pygame
 import fight
 import saves
 import choice_menu
+import settings
 
 
-if __name__ == '__main__':
+def play():
+    global_peremen.run = True
     pygame.display.set_caption('project')
     global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
-    while True:
+    while global_peremen.run:
         global_peremen.screen.fill(pygame.Color(0, 0, 0))
         events = pygame.event.get()
         for event in events:
@@ -40,6 +42,16 @@ if __name__ == '__main__':
             if global_peremen.choice_menu is None:
                 global_peremen.choice_menu = choice_menu.Choice_menu()
             global_peremen.choice_menu.update(events)
+        if global_peremen.MOD == 'settings':
+            settings.settings.update(events)
         global_peremen.clock.tick(global_peremen.fps)
         pygame.display.update()
+
+
+if __name__ == '__main__':
+    while global_peremen.new_game:
+        global_peremen.new_game = False
+        menu.menu = menu.Menu()
+        settings.settings = settings.Settings()
+        play()
 

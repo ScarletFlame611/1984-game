@@ -8,7 +8,6 @@ class Choice_menu:
         id = 1
         for save in saves_:
             save = save.split('/')
-            print(save[-1][:-1] + '-' + str(id))
             buttons.append((save[-1][:-1] + '-' + str(id), self.load, id))
             id += 1
         if buttons:

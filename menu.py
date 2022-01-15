@@ -7,10 +7,12 @@ import in_game_menu
 
 class Menu:
     def __init__(self):
-        self.start = global_peremen.Button("New game", global_peremen.WIDTH // 2, global_peremen.HIGH // 3, self.new_game)
-        self.cont = global_peremen.Button("Continue game", global_peremen.WIDTH // 2, global_peremen.HIGH // 2, self.continuee)
-        self.close = global_peremen.Button("Close", global_peremen.WIDTH // 2, global_peremen.HIGH // 1.5, self.close)
-        self.btns_menu = (self.start, self.cont, self.close)
+        y = global_peremen.HIGH // 5
+        self.start = global_peremen.Button("New game", global_peremen.WIDTH // 2, y, self.new_game)
+        self.cont = global_peremen.Button("Continue game", global_peremen.WIDTH // 2, self.start.y + self.start.h * 1.5, self.continuee)
+        self.settings = global_peremen.Button("Settings", global_peremen.WIDTH // 2, self.cont.y + self.cont.h * 1.5, self.settings)
+        self.close = global_peremen.Button("Close", global_peremen.WIDTH // 2, self.settings.y + self.settings.h * 1.5, self.close)
+        self.btns_menu = (self.start, self.cont, self.settings, self.close)
 
     def update(self, events):
         for btn in self.btns_menu:
@@ -26,6 +28,9 @@ class Menu:
 
     def continuee(self):
         global_peremen.MOD = 'choice_menu'
+
+    def settings(self):
+        global_peremen.MOD = 'settings'
 
 '''
     def btn_continue(self, screen):
