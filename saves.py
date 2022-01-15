@@ -4,8 +4,6 @@ import global_peremen
 def save():
     with open('data\saves.txt', 'a', newline='') as save:
         if global_peremen.NAME != '':
-            save.write(str(global_peremen.WIDTH) + '/')
-            save.write(str(global_peremen.HIGH) + '/')
             save.write(str(global_peremen.NAME) + '\n')
 
 
