@@ -6,7 +6,7 @@ class In_game_menu:
         self.bg = pygame.transform.scale(global_peremen.load_image(bg_image_name, colorkey=-1), global_peremen.SIZE)
         self.hero = global_peremen.Button('', global_peremen.WIDTH // 2 - (global_peremen.WIDTH // 14), global_peremen.HIGH // 2 - (global_peremen.HIGH // 6), self.dont_touch, name_image=hero_image_name, size=(global_peremen.WIDTH // 7, global_peremen.HIGH // 3))
         self.map = global_peremen.Button('', global_peremen.WIDTH - (global_peremen.WIDTH // 5), global_peremen.HIGH - (global_peremen.HIGH // 5), self.open_mup, name_image=map_image_name, size=(global_peremen.WIDTH // 5, global_peremen.HIGH // 5))
-        self.scroll = global_peremen.Scroll([('1', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('click me pls', self.open_mup,)], 20, 100)
+        self.scroll = global_peremen.Scroll([('1', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('click me pls', self.open_mup,)], 0 + global_peremen.WIDTH // 40, global_peremen.HIGH // 2)
         self.save = global_peremen.Button('save', global_peremen.WIDTH, 0, saves.save)
         self.save.x = global_peremen.WIDTH - self.save.w
         self.close = global_peremen.Button('close', self.save.x, 0, self.close)
@@ -17,7 +17,10 @@ class In_game_menu:
         self.font = global_peremen.font.render(text, True, (255, 255, 255))
 
     def close(self):
-        global_peremen.MOD = 'main_menu'
+        if self.mod == 'menu':
+            global_peremen.MOD = 'main_menu'
+        elif self.mod == 'map':
+            self.mod = 'menu'
 
     def update(self, events):
         if self.mod == 'menu':

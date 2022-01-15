@@ -19,6 +19,7 @@ class Menu:
             btn.render(global_peremen.screen, events)
 
     def new_game(self):
+        global_peremen.choice_menu = None
         global_peremen.MOD = 'name_input'
         global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
 

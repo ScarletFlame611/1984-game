@@ -6,6 +6,8 @@ class Settings:
         self.scroll = global_peremen.Scroll([('screen_size', self.set_size), ('Fps', self.change_fps)], global_peremen.WIDTH // 2, 20, mod='vertical')
         self.input = global_peremen.Input_set((10, 10), (global_peremen.WIDTH // 4, global_peremen.HIGH // 10), '0123456789 ', [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 32])
         self.mod = ''
+        self.close = global_peremen.Button('close', global_peremen.WIDTH, 0, self.close)
+        self.close.x = self.close.x - self.close.w
 
     def set_size(self):
         self.mod = 'Size'
@@ -15,6 +17,7 @@ class Settings:
 
     def update(self, events):
         self.scroll.update(events)
+        self.close.render(global_peremen.screen, events)
         result = self.input.update(events)
         if result:
             if self.mod == 'Size':
@@ -33,6 +36,9 @@ class Settings:
                 if len(result.strip().split()) == 1 and result.strip().split()[0].isdigit():
                     global_peremen.fps = int(result.strip().split()[0])
                     global_peremen.MOD = 'main_menu'
+
+    def close(self):
+        global_peremen.MOD = 'main_menu'
 
 
 settings = Settings()

@@ -164,6 +164,8 @@ class Name_input:
         else:
             self.random_name_button = None
             self.continue_button.x = self.text_input.w + self.x - self.random_name_button.w
+        self.close = Button('close', WIDTH, 0, self.close)
+        self.close.x = self.close.x - self.close.w
 
     def create_random_name(self, symbols='фбвгдеёжзийклмнопрстуфхцчшщъыьэюяabsdefghijklmnopqrstuvwxyz1234567890', counts=(5, 10)):
         name = ''
@@ -180,7 +182,12 @@ class Name_input:
             self.text_input.size = self.text_input.w, self.text_input.h = self.min_size
         self.random_name_button.x = self.text_input.w + self.x - self.random_name_button.w
 
+    def close(self):
+        global MOD
+        MOD = 'main_menu'
+
     def update(self, events):
+        self.close.render(screen, events)
         for event in events:
             if event.type == pygame.KEYDOWN:
                 if event.key in indexes and self.mod and self.actual_symbols[indexes.index(event.key)] != ' ':

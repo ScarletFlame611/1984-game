@@ -6,6 +6,8 @@ class Choice_menu:
         buttons = []
         saves_ = saves.all_saves()
         id = 1
+        self.close = global_peremen.Button('close', global_peremen.WIDTH, 0, self.close)
+        self.close.x = self.close.x - self.close.w
         for save in saves_:
             save = save.split('/')
             buttons.append((save[-1][:-1] + '-' + str(id), self.load, id))
@@ -16,10 +18,14 @@ class Choice_menu:
             self.scroll = None
 
     def update(self, events):
+        self.close.render(global_peremen.screen, events)
         if self.scroll is not None:
             self.scroll.update(events)
         else:
             global_peremen.MOD = 'main_menu'
+
+    def close(self):
+        global_peremen.MOD = 'main_menu'
 
     def load(self, id):
         sav = saves.load(id)
