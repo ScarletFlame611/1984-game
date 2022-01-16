@@ -87,9 +87,6 @@ class Player(pygame.sprite.Sprite):
                     (time.time() - start_frame) * frames_per_second % amount_of_frames)
                 self.image = self.goframes[
                     self.cur_frame]
-            if pygame.sprite.spritecollideany(self, wall_group):
-                # если произошло столкновение со стеной - перемещаем обратно
-                self.rect.move_ip([-i for i in coords])
             hits = pygame.sprite.spritecollide(self, bonus_group, False)
             if hits:
                 for sprite in hits:
@@ -110,6 +107,9 @@ class Player(pygame.sprite.Sprite):
                     if pygame.sprite.collide_rect(sprite, sprite):
                         self.my_enemy = sprite
                 global_peremen.MOD = "fight_start"
+            if pygame.sprite.spritecollideany(self, wall_group):
+                # если произошло столкновение со стеной - перемещаем обратно
+                self.rect.move_ip([-i for i in coords])
         else:
             self.image = player_image if self.current_state == "right" else pygame.transform.flip(
                 player_image, True, False)
@@ -635,6 +635,7 @@ class Safe(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.add(for_open)
+        self.add(wall_group)
         self.image = global_peremen.load_image('Safe.png')
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
