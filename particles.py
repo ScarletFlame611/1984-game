@@ -2,17 +2,16 @@ import pygame
 import os
 import sys
 import random
-import global_peremen
 
-#константы и группа спрайтов
+# константы и группа спрайтов
 GRAVITY = 1
 particles = pygame.sprite.Group()
 screen_rect = None
 
 
-#класс частиц
+# класс частиц
 class Particle(pygame.sprite.Sprite):
-    #инициализация
+    # инициализация
     def __init__(self, pos, dx, dy, fires, scales):
         super().__init__(particles)
         scale = random.choice(scales)
@@ -23,7 +22,7 @@ class Particle(pygame.sprite.Sprite):
         self.rect.x, self.rect.y = pos
         self.gravity = GRAVITY
 
-    #функция для передвижения частиц
+    # функция для передвижения частиц
     def update(self):
         self.velocity[1] += self.gravity
         self.rect.x += self.velocity[0]
@@ -32,7 +31,7 @@ class Particle(pygame.sprite.Sprite):
             self.kill()
 
 
-#подгружаем картинки
+# подгружаем картинки
 def load_image(name, colorkey=None):
     fullname = os.path.join('data', name)
     if not os.path.isfile(fullname):
@@ -48,7 +47,7 @@ def load_image(name, colorkey=None):
     return image
 
 
-#создание картинок
+# создание картинок
 def create_particles(position, fires, scales, scr_rect, particle_count=20):
     global screen_rect
     screen_rect = scr_rect
@@ -56,7 +55,3 @@ def create_particles(position, fires, scales, scr_rect, particle_count=20):
     fires = [load_image(elem, colorkey=-1) for elem in fires]
     for _ in range(particle_count):
         Particle(position, random.choice(numbers), random.choice(numbers), fires, scales)
-
-
-#пример создания частиц(выдаст ошибку, так как width и height нужно передовать из файла в котором хранится screen)
-create_particles((player.rect.x, player.rect.y), ['particles.png'], [1, 5, 10], (0, 0, width, height))
