@@ -59,7 +59,6 @@ class Animation:
         return self.common_cd
 
 
-
 if __name__ == '__main__':
     pygame.init()
     pygame.display.set_caption('свой курсор мыши')

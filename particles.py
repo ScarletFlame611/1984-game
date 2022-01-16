@@ -2,6 +2,7 @@ import pygame
 import os
 import sys
 import random
+import global_peremen
 
 #константы и группа спрайтов
 GRAVITY = 1

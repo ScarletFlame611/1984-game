@@ -3,6 +3,7 @@ import os
 import sys
 import time
 import global_peremen
+import particles
 
 pygame.init()
 pygame.display.set_caption('Обучение')
@@ -17,8 +18,11 @@ player_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
 bonus_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
-
+enemies = []  # группа для всех врагов
+bar_x, bar_y = 10, 10
+EVENTS = None
 coins = pygame.sprite.Group()
+level_name = None
 
 # загрузка изображения
 
@@ -39,16 +43,24 @@ class Player(pygame.sprite.Sprite):
         self.image = player_image
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 10, tile_height * pos_y + 5)
+        self.image = None
         self.runframes = []
         self.goframes = []
+        self.fire = []
+        self.start = []
         for i in range(1, 9):
             self.runframes.append(global_peremen.load_image(f"run{i}.png"))
         for i in range(1, 7):
             self.goframes.append(global_peremen.load_image(f"go{i}.png"))
+        for i in range(1, 6):
+            self.fire.append(global_peremen.load_image(f"fire{i}.png"))
+        for i in range(1, 8):
+            self.start.append(global_peremen.load_image(f"start{i}.png"))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
         self.hp = 150
         self.score = 0
+        self.is_start = False
 
     # передаются координаты сдвига игрока и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
