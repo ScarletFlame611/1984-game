@@ -525,6 +525,124 @@ class Fight:
                 self.player_count -= mana
 
 
+class Trap(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('trap.png')
+        self.x = pos_x
+        self.y = pos_y
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 1, tile_height * pos_y + 50)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.hp -= 10
+            self.image = global_peremen.load_image('trap2.png')
+            self.rect = self.image.get_rect().move(
+                tile_width * self.x + 10, tile_height * self.y + 30)
+            self.used = True
+
+
+class Key(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('key.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 20, tile_height * pos_y + 15)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.keys += 1
+            self.used = True
+            self.remove(bonus_group)
+            self.remove(all_sprites)
+
+
+class Instrument(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('key2.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 20, tile_height * pos_y + 15)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.instruments += 1
+            self.used = True
+            self.remove(bonus_group)
+            self.remove(all_sprites)
+
+
+class Panel(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(for_open)
+        self.image = global_peremen.load_image('broken_panel.jpg')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def open(self, other):
+        if other.instruments > 0 and not self.used:
+            self.used = True
+            other.score += 100
+            other.instruments -= 1
+            self.image = global_peremen.load_image('panel.jpg')
+
+
+class Safe(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(for_open)
+        self.add(wall_group)
+        self.image = global_peremen.load_image('Safe.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def open(self, other):
+        if other.keys > 0 and not self.used:
+            self.used = True
+            other.score += 100
+            other.keys -= 1
+            self.image = global_peremen.load_image('Safe1.png')
+
+
+class Speed_Up(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(bonus_group)
+        self.image = global_peremen.load_image('fast.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def buff(self, other):
+        global v
+        if not self.used:
+            v += 1
+            self.used = True
+
+
+class Speed_Down(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(bonus_group)
+        self.image = global_peremen.load_image('slow.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def buff(self, other):
+        global v
+        if not self.used:
+            v -= 1
+            self.used = True
+
+
 class UI:
     def __init__(self):
         self.pause = False
