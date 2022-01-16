@@ -4,6 +4,7 @@ import sys
 import time
 import global_peremen
 import particles
+import in_game_menu
 
 pygame.init()
 pygame.display.set_caption('Обучение')
@@ -279,7 +280,7 @@ class Level:
         if global_peremen.MOD == "fight_start":
             for enemy in enemies:
                 if enemy.in_fight:
-                    self.fight = Fight(self.player, enemy)
+                    self.fight = Fight(self.player, enemy, self.level)
         self.player.iamge = None
         for event in events:
             if event.type == pygame.QUIT:
@@ -349,13 +350,14 @@ class Level:
 
 
 class Fight:
-    def __init__(self, player, enemy):
+    def __init__(self, player, enemy, level):
+        self.level = level
         self.player = player
         self.enemy = enemy
         x = global_peremen.WIDTH // tile_width
         y = global_peremen.HIGH // tile_height
-        self.create_lab(x, y)
-        self.w, self.h = x, y
+        self.create_lab()
+        self.w, self.h = len(self.level[0]), len(self.level)
         play_x = self.player.rect.x // tile_width
         play_y = self.player.rect.y // tile_height
         self.player_cords = (play_x, play_y)
@@ -372,36 +374,36 @@ class Fight:
         color = pygame.Color(70, 70, 70)
         x = global_peremen.WIDTH // tile_width
         y = global_peremen.HIGH // tile_height
-        self.create_lab(self.w, self.h)
+        self.create_lab()
+        path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)
         for x1 in range(x):
             for y1 in range(y):
                 color_light = pygame.Color(230, 230, 230)
                 self.draw_block(color, x1, y1)
-                if self.is_path(x1, y1):
+                if self.is_path(x1, y1, path):
                     pos = pygame.mouse.get_pos()
                     if pos[0] // tile_width == x1 and pos[1] // tile_height == y1:
                         color_light = pygame.Color(100, 250, 250)
                     self.draw_block(color_light, x1, y1, size=2)
 
-    def create_lab(self, x, y):
+    def create_lab(self):
         self.lab = []
-        for y1 in range(y):
+        for y1 in self.level:
             row = []
-            for x1 in range(x):
-                for elem in wall_group:
-                    if elem.rect.x // tile_width == x1 and elem.rect.y // tile_height == y1:
-                        row.append(-1)
-                        break
+            for x1 in y1:
+                if x1 == "#":
+                    row.append(-1)
                 else:
                     row.append(0)
             self.lab.append(row)
 
     def motion(self, x, y):
         if self.mod == "player":
+            path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)
             if not (x == self.player.rect.x // tile_width and y == self.player.rect.y // tile_height):
-                self.create_lab(self.w, self.h)
-                if self.is_path(x, y) and not (self.enemy.rect.x // tile_width == x and
-                                               self.enemy.rect.y // tile_height == y):
+                self.create_lab()
+                if self.is_path(x, y, path) and not (self.enemy.rect.x // tile_width == x and
+                                                     self.enemy.rect.y // tile_height == y):
                     self.player.rect.x = x * tile_width + 10
                     self.player.rect.y = y * tile_height + 5
                     self.player_count -= \
@@ -409,7 +411,6 @@ class Fight:
                     play_x = self.player.rect.x // tile_width
                     play_y = self.player.rect.y // tile_height
                     self.player_cords = (play_x, play_y)
-                    self.create_lab(global_peremen.WIDTH // tile_width, global_peremen.HIGH // tile_height)
 
     # отрисовка блока x, y
     def draw_block(self, color, x, y, size=1):
@@ -428,7 +429,7 @@ class Fight:
         self.draw_blocks()
 
     def enemy_turn(self):
-        self.create_lab(self.w, self.h)
+        self.create_lab()
         path = self.has_path(self.enemy.cords[0], self.enemy.cords[1], 0, self.w,
                              self.h, self.lab)[self.player_cords[1]][self.player_cords[0]]
         if path <= self.enemy.range:
@@ -438,7 +439,7 @@ class Fight:
                 self.enemy_count -= 1
         else:
             new_lab = []
-            self.create_lab(self.w, self.h)
+            self.create_lab()
             path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w,
                                  self.h, self.lab)
             for y in range(self.h):
@@ -449,7 +450,7 @@ class Fight:
                 new_lab.append(row)
             min = 1000
             right = None
-            self.create_lab(self.w, self.h)
+            self.create_lab()
             path = self.has_path(self.enemy.cords[0], self.enemy.cords[1], 0, self.w,
                                  self.h, self.lab)
             for y, elem in enumerate(new_lab):
@@ -462,7 +463,7 @@ class Fight:
                             min_path = path_to_enemy
             self.enemy.motion(right[0], right[1])
             self.enemy_count -= min_path
-            self.create_lab(global_peremen.WIDTH // tile_width, global_peremen.HIGH // tile_height)
+            self.create_lab()
         if self.enemy_count <= 0:
             self.player_count = 5
             self.mod = 'player'
@@ -491,9 +492,9 @@ class Fight:
         turns = self.enemy_count if self.mod == "enemy" else self.player_count
         ui.draw_turns(self.mod, turns)
 
-    def is_path(self, x, y):
+    def is_path(self, x, y, path):
         if x + 1 <= self.w and y + 1 <= self.h:
-            path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)[y][x]
+            path = path[y][x]
             if path <= self.player_count and path > 0:
                 return True
         return False
@@ -522,6 +523,124 @@ class Fight:
                 self.player.attack(self.enemy, damage)
                 self.player_animation_cd = 5
                 self.player_count -= mana
+
+
+class Trap(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('trap.png')
+        self.x = pos_x
+        self.y = pos_y
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 1, tile_height * pos_y + 50)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.hp -= 10
+            self.image = global_peremen.load_image('trap2.png')
+            self.rect = self.image.get_rect().move(
+                tile_width * self.x + 10, tile_height * self.y + 30)
+            self.used = True
+
+
+class Key(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('key.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 20, tile_height * pos_y + 15)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.keys += 1
+            self.used = True
+            self.remove(bonus_group)
+            self.remove(all_sprites)
+
+
+class Instrument(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('key2.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 20, tile_height * pos_y + 15)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.instruments += 1
+            self.used = True
+            self.remove(bonus_group)
+            self.remove(all_sprites)
+
+
+class Panel(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(for_open)
+        self.image = global_peremen.load_image('broken_panel.jpg')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def open(self, other):
+        if other.instruments > 0 and not self.used:
+            self.used = True
+            other.score += 100
+            other.instruments -= 1
+            self.image = global_peremen.load_image('panel.jpg')
+
+
+class Safe(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(for_open)
+        self.add(wall_group)
+        self.image = global_peremen.load_image('Safe.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def open(self, other):
+        if other.keys > 0 and not self.used:
+            self.used = True
+            other.score += 100
+            other.keys -= 1
+            self.image = global_peremen.load_image('Safe1.png')
+
+
+class Speed_Up(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(bonus_group)
+        self.image = global_peremen.load_image('fast.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def buff(self, other):
+        global v
+        if not self.used:
+            v += 1
+            self.used = True
+
+
+class Speed_Down(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(tiles_group, all_sprites)
+        self.add(bonus_group)
+        self.image = global_peremen.load_image('slow.png')
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x, tile_height * pos_y)
+        self.used = False
+
+    def buff(self, other):
+        global v
+        if not self.used:
+            v -= 1
+            self.used = True
 
 
 class UI:
@@ -614,8 +733,9 @@ class UI:
         global_peremen.MOD = level_name
 
     def back(self):
+        global_peremen.in_game_menu.mod = 'menu'
+        global_peremen.MOD = "in_game_menu"
         self.delete_level()
-        global_peremen.MOD = "main_menu"
 
     def resume(self):
         self.pause = False
@@ -627,7 +747,7 @@ class UI:
         again = global_peremen.Button("Start over", global_peremen.WIDTH // 2,
                                       global_peremen.HIGH // 2 - global_peremen.HIGH // 6, self.again)
         contin = global_peremen.Button("Continue", global_peremen.WIDTH // 2,
-                                      global_peremen.HIGH // 2, self.resume)
+                                       global_peremen.HIGH // 2, self.resume)
 
         back = global_peremen.Button("Back", global_peremen.WIDTH // 2,
                                      global_peremen.HIGH // 2 + global_peremen.HIGH // 6, self.back)
@@ -647,5 +767,6 @@ class UI:
                 elem.render(global_peremen.screen, events=events)
             pygame.display.flip()
             global_peremen.clock.tick(FPS)
+
 
 ui = UI()
