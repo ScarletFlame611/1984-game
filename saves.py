@@ -12,7 +12,7 @@ def load(id):
         with open('data\saves.txt', 'r', newline='') as load:
             loads = load.readlines()
             if id <= len(loads):
-                return loads[id - 1]
+                return loads[id - 1][:-1]
             return None
     except NameError:
         print('нет такого файла')

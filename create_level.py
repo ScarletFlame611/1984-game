@@ -1,10 +1,8 @@
 import pygame
-import os
 import sys
 import time
 import global_peremen
 import particles
-import in_game_menu
 
 pygame.init()
 pygame.display.set_caption('Обучение')
@@ -19,6 +17,9 @@ player_group = pygame.sprite.Group()
 wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
 bonus_group = pygame.sprite.Group()
 enemies_group = pygame.sprite.Group()
+borders_group = pygame.sprite.Group()
+coins = pygame.sprite.Group()
+for_open = pygame.sprite.Group()
 enemies = []  # группа для всех врагов
 bar_x, bar_y = 10, 10
 EVENTS = None
@@ -60,6 +61,8 @@ class Player(pygame.sprite.Sprite):
         self.current_state = "right"  # текущее направление, куда смотрит игрок
         self.hp = 150
         self.score = 0
+        self.keys = 0
+        self.instruments = 0
         self.is_start = False
 
     # передаются координаты сдвига игрока и направление движения
@@ -92,7 +95,20 @@ class Player(pygame.sprite.Sprite):
                 for sprite in hits:
                     if pygame.sprite.collide_rect(sprite, sprite):
                         sprite.buff(self)
-
+            hits = pygame.sprite.spritecollide(self, for_open, False)
+            if hits:
+                for sprite in hits:
+                    if pygame.sprite.collide_rect(sprite, sprite):
+                        sprite.open(self)
+            if pygame.sprite.spritecollideany(self, wall_group):
+                # если произошло столкновение со стеной - перемещаем обратно
+                self.rect.move_ip([-i for i in coords])
+            enemy = pygame.sprite.spritecollide(self, enemies_group, False)
+            if enemy:
+                for sprite in enemy:
+                    if pygame.sprite.collide_rect(sprite, sprite):
+                        self.my_enemy = sprite
+                global_peremen.MOD = "fight_start"
         else:
             self.image = player_image if self.current_state == "right" else pygame.transform.flip(
                 player_image, True, False)
@@ -181,10 +197,12 @@ class Border(pygame.sprite.Sprite):
         super().__init__(all_sprites)
         if x1 == x2:
             self.add(wall_group)
+            self.add(borders_group)
             self.image = pygame.Surface([1, y2 - y1])
             self.rect = pygame.Rect(x1, y1, 1, y2 - y1)
         else:
             self.add(wall_group)
+            self.add(borders_group)
             self.image = pygame.Surface([x2 - x1, 1])
             self.rect = pygame.Rect(x1, y1, x2 - x1, 1)
 
@@ -258,7 +276,9 @@ class Level:
                     Tile('empty', x, y)
                 elif self.level[y][x] == '#':
                     Tile('wall', x, y)
-
+                elif self.level[y][x] == '@':
+                    Tile('empty', x, y)
+                    player = Player(x, y)
                 elif self.level[y][x] == '+':
                     Tile('empty', x, y)
                     HealTile(x, y)
@@ -267,10 +287,26 @@ class Level:
                     Coin(x, y)
                 elif self.level[y][x] == "&":
                     Tile('empty', x, y)
-                    enemies.append(Enemy(x, y))
-                elif self.level[y][x] == '@':
+                    Enemy(x, y)
+                elif self.level[y][x] == ">":
+                    Speed_Up(x, y)
+                elif self.level[y][x] == "<":
+                    Speed_Down(x, y)
+                elif self.level[y][x] == "<":
+                    Speed_Down(x, y)
+                elif self.level[y][x] == "k":
                     Tile('empty', x, y)
-                    player = Player(x, y)
+                    Key(x, y)
+                elif self.level[y][x] == "i":
+                    Tile('empty', x, y)
+                    Instrument(x, y)
+                elif self.level[y][x] == "?":
+                    Safe(x, y)
+                elif self.level[y][x] == "!":
+                    Panel(x, y)
+                elif self.level[y][x] == "=":
+                    Tile('empty', x, y)
+                    Trap(x, y)
         self.player = player
         self.x, self.y = x, y
 
@@ -334,6 +370,7 @@ class Level:
             self.fight.update()
         enemies_group.draw(global_peremen.screen)
         player_group.draw(global_peremen.screen)
+        borders_group.draw(global_peremen.screen)
         ui.draw_bar(global_peremen.screen, bar_x, bar_y, self.player.hp)
         ui.draw_score(self.player.score)
 
