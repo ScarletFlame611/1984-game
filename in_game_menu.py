@@ -3,11 +3,25 @@ import global_peremen, pygame
 
 class In_game_menu:
     def __init__(self, bg_image_name, hero_image_name, map_image_name):
-        self.bg = pygame.transform.scale(global_peremen.load_image(bg_image_name, colorkey=-1), global_peremen.SIZE)
-        self.hero = global_peremen.Button('', global_peremen.WIDTH // 2 - (global_peremen.WIDTH // 14), global_peremen.HIGH // 2 - (global_peremen.HIGH // 6), self.dont_touch, name_image=hero_image_name, size=(global_peremen.WIDTH // 7, global_peremen.HIGH // 3))
-        self.map = global_peremen.Button('', global_peremen.WIDTH - (global_peremen.WIDTH // 5), global_peremen.HIGH - (global_peremen.HIGH // 5), self.open_mup, name_image=map_image_name, size=(global_peremen.WIDTH // 5, global_peremen.HIGH // 5))
-        self.scroll = global_peremen.Scroll([('1', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('', self.open_mup, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)), ('click me pls', self.open_mup,)], 20, 100)
         self.mod = 'menu'
+        self.bg = pygame.transform.scale(global_peremen.load_image(bg_image_name, colorkey=-1), global_peremen.SIZE)
+        self.hero = global_peremen.Button('', global_peremen.WIDTH // 2 - (global_peremen.WIDTH // 14),
+                                          global_peremen.HIGH // 2 - (global_peremen.HIGH // 6), self.dont_touch,
+                                          name_image=hero_image_name, size=(global_peremen.WIDTH // 7,
+                                                                            global_peremen.HIGH // 3))
+        self.map = global_peremen.Button('', global_peremen.WIDTH - (global_peremen.WIDTH // 5),
+                                         global_peremen.HIGH - (global_peremen.HIGH // 5), self.open_mup,
+                                         name_image=map_image_name, size=(global_peremen.WIDTH // 5,
+                                                                          global_peremen.HIGH // 5))
+        self.scroll = global_peremen.Scroll([('1', self.open_level, map_image_name,
+                                              (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)),
+                                             ('2', self.open_level, map_image_name,
+                                              (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)),
+                                             ('3', self.open_level, map_image_name,
+                                              (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)),
+                                             ('4', self.open_level, map_image_name,
+                                              (global_peremen.WIDTH // 5, global_peremen.HIGH // 5)),
+                                             ('click me pls', self.open_mup,)], 20, 100)
         self.dont_touch_cd = 0
 
     def update(self, events):
@@ -19,7 +33,8 @@ class In_game_menu:
                 text = "don't touch me!"
                 font = pygame.font.Font(None, 50)
                 font = font.render(text, True, (255, 255, 255))
-                global_peremen.screen.blit(font, (self.hero.x + (font.get_width() // 2), self.hero.y + (font.get_height() // 2)))
+                global_peremen.screen.blit(font, (
+                    self.hero.x + (font.get_width() // 2), self.hero.y + (font.get_height() // 2)))
                 self.dont_touch_cd -= 1
         elif self.mod == 'map':
             self.scroll.update(events)
@@ -30,8 +45,9 @@ class In_game_menu:
     def open_mup(self):
         self.mod = 'map'
 
-    def open_level(self):
-        global_peremen.MOD = "level" + str(1)
+    def open_level(self, num):
+        global_peremen.MOD = "level" + str(num)
+        self.mod = "menu"
 
 
 in_game_menu = In_game_menu('bg.png', 'player.png', 'map.png')

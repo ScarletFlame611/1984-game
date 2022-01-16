@@ -38,8 +38,8 @@ class Button:
         pos = pygame.mouse.get_pos()
         for event in events:
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                    if self.is_mouse_on(*event.pos):
-                        self.click_on()
+                if self.is_mouse_on(*event.pos):
+                    self.click_on()
         if self.image is not None:
             screen.blit(self.image, (self.x, self.y))
         else:
@@ -64,7 +64,10 @@ class Button:
         screen.blit(self.font_light, (self.x, self.y))
 
     def click_on(self):  # это на случай, если мы тыкнем на кнопочку ._.
-        self.function()
+        if self.text.isdigit():
+            self.function(self.text)
+        else:
+            self.function()
 
     def is_mouse_on(self, x, y):
         return self.x <= x <= self.x + self.w and self.y <= y <= self.y + self.h
@@ -72,7 +75,6 @@ class Button:
 
 class Scroll:
     def __init__(self, buttons, x, y):
-        self.buttons = buttons
         self.x = x
         self.y = y
         self.step = WIDTH // 30

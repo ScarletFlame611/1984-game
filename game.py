@@ -6,7 +6,6 @@ import in_game_menu
 import pygame
 import fight
 
-
 if __name__ == '__main__':
     pygame.display.set_caption('project')
     while True:
@@ -20,16 +19,15 @@ if __name__ == '__main__':
             menu.menu.update(events)
         if global_peremen.MOD == 'in_game_menu':
             in_game_menu.in_game_menu.update(events)
+            global_peremen.clock.tick(global_peremen.fps)
+
         if "level" in global_peremen.MOD:
-            number = global_peremen.MOD[-1]
-            name_level = "level" + number
-            now_level = create_level.level(name_level)
+            now_level = create_level.Level(global_peremen.MOD)
             now_level.generate_level()
-            now_level.play()
+            now_level.play(events)
             global_peremen.MOD = "play"
-        if global_peremen.MOD == 'play' or global_peremen.MOD == 'fight_start':
-            now_level.play()
+        if global_peremen.MOD in ('play', 'fight_start', 'fight'):
+            now_level.play(events)
 
         global_peremen.clock.tick(global_peremen.fps)
         pygame.display.update()
-
