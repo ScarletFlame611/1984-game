@@ -1,11 +1,13 @@
 import pygame, os
 import sys, random
+from tkinter import *
 
 pygame.init()
 clock = pygame.time.Clock()
 fps = 60
 MOD = 'main_menu'
-SIZE = WIDTH, HIGH = 900, 500
+root = Tk()
+SIZE = WIDTH, HIGH = root.winfo_screenwidth(), root.winfo_screenheight()
 screen = pygame.display.set_mode(SIZE)
 font = pygame.font.Font(None, min(SIZE) // 10)
 NAME = ''
