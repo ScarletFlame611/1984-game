@@ -15,7 +15,6 @@ class Particle(pygame.sprite.Sprite):
     def __init__(self, pos, dx, dy, fires, scales):
         super().__init__(particles)
         scale = random.choice(scales)
-        print(scale)
         self.image = pygame.transform.scale(random.choice(fires), (scale, scale))
         self.rect = self.image.get_rect()
         self.velocity = [dx, dy]

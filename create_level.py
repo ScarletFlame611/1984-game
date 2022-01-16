@@ -98,6 +98,7 @@ class Player(pygame.sprite.Sprite):
             hits = pygame.sprite.spritecollide(self, for_open, False)
             if hits:
                 for sprite in hits:
+                    print('here')
                     if pygame.sprite.collide_rect(sprite, sprite):
                         sprite.open(self)
             if pygame.sprite.spritecollideany(self, wall_group):
@@ -641,6 +642,7 @@ class Safe(pygame.sprite.Sprite):
         self.used = False
 
     def open(self, other):
+        print('here')
         if other.keys > 0 and not self.used:
             self.used = True
             other.score += 100

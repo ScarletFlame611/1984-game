@@ -40,7 +40,6 @@ class Animation:
                     if event.type == pygame.QUIT:
                         return False
                 if cd == 0:
-                    print('here')
                     number += 1
                     if number < len(self.images):
                         cd = self.set_cd(number) * fps
