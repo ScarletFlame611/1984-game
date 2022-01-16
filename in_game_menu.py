@@ -14,8 +14,8 @@ class In_game_menu:
                                               (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 3),
                                              ('4', self.open_level, map_image_name,
                                               (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 4),
-                                             ('4', self.open_level, map_image_name,
-                                              (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 4),
+                                             ('0', self.open_level, map_image_name,
+                                              (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 0),
                                              ('4', self.open_level, map_image_name,
                                               (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 4)],
                                             0 + global_peremen.WIDTH // 40, global_peremen.HIGH // 2)
