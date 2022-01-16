@@ -4,6 +4,7 @@ import sys
 import time
 import global_peremen
 import particles
+import in_game_menu
 
 pygame.init()
 pygame.display.set_caption('Обучение')
@@ -614,8 +615,9 @@ class UI:
         global_peremen.MOD = level_name
 
     def back(self):
+        global_peremen.in_game_menu.mod = 'menu'
+        global_peremen.MOD = "in_game_menu"
         self.delete_level()
-        global_peremen.MOD = "main_menu"
 
     def resume(self):
         self.pause = False

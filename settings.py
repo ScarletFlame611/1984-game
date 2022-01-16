@@ -21,26 +21,24 @@ class Settings:
         result = self.input.update(events)
         if result:
             if self.mod == 'Size':
-                self.input.mod = 0
                 if len(result.split()) == 2 and result.split()[0].isdigit() and result.split()[1].isdigit():
                     global_peremen.SIZE = global_peremen.WIDTH, global_peremen.HIGH = int(result.split()[0]), int(result.split()[1])
                     global_peremen.screen = pygame.display.set_mode(global_peremen.SIZE)
-                    global_peremen.run = False
-                    global_peremen.new_game = True
                     global_peremen.MOD = 'main_menu'
                     global_peremen.font = pygame.font.Font(None, min(global_peremen.SIZE) // 10)
-                    global_peremen.NAME = ''
-                    global_peremen.enter_nam = None
-                    global_peremen.choice_menu = None
-                    global_peremen.in_game_menu = None
             elif self.mod == 'fps':
-                self.input.mod = 0
                 if len(result.strip().split()) == 1 and result.strip().split()[0].isdigit():
                     global_peremen.fps = int(result.strip().split()[0])
                     global_peremen.MOD = 'main_menu'
+            global_peremen.NAME = ''
+            global_peremen.enter_nam = None
+            global_peremen.choice_menu = None
+            global_peremen.in_game_menu = None
+            global_peremen.run = False
+            global_peremen.new_game = True
+
 
     def close(self):
-        self.input.mod = 0
         global_peremen.MOD = 'main_menu'
 
 
