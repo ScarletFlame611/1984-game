@@ -277,9 +277,6 @@ class Level:
                     Tile('empty', x, y)
                 elif self.level[y][x] == '#':
                     Tile('wall', x, y)
-                elif self.level[y][x] == '@':
-                    Tile('empty', x, y)
-                    player = Player(x, y)
                 elif self.level[y][x] == '+':
                     Tile('empty', x, y)
                     HealTile(x, y)
@@ -288,7 +285,10 @@ class Level:
                     Coin(x, y)
                 elif self.level[y][x] == "&":
                     Tile('empty', x, y)
-                    Enemy(x, y)
+                    enemies.append(Enemy(x, y))
+                elif self.level[y][x] == '@':
+                    Tile('empty', x, y)
+                    player = Player(x, y)
                 elif self.level[y][x] == ">":
                     Speed_Up(x, y)
                 elif self.level[y][x] == "<":
@@ -635,7 +635,6 @@ class Safe(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.add(for_open)
-        self.add(wall_group)
         self.image = global_peremen.load_image('Safe.png')
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
@@ -662,7 +661,7 @@ class Speed_Up(pygame.sprite.Sprite):
     def buff(self, other):
         global v
         if not self.used:
-            v += 1
+            v += 2
             self.used = True
 
 
@@ -678,7 +677,7 @@ class Speed_Down(pygame.sprite.Sprite):
     def buff(self, other):
         global v
         if not self.used:
-            v -= 1
+            v -= 2
             self.used = True
 
 
