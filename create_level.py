@@ -241,6 +241,9 @@ class level:
                     Safe(x, y)
                 elif self.level[y][x] == "!":
                     Panel(x, y)
+                elif self.level[y][x] == "=":
+                    Tile('empty', x, y)
+                    Trap(x, y)
         self.player = player
         self.width = len(self.level[0]) * tile_width
         self.height = len(self.level) * tile_height
@@ -280,10 +283,6 @@ class level:
         if global_peremen.MOD == "fight_start":
             fight = Fight(self.player)
             fight.update()
-        Border(0, 0, self.width, 0)
-        Border(0, self.height, self.width, self.height)
-        Border(0, 0, 0, self.height)
-        Border(self.width, 0, self.width, self.height)
         enemies_group.draw(global_peremen.screen)
         player_group.draw(global_peremen.screen)
         borders_group.draw(global_peremen.screen)
@@ -381,6 +380,25 @@ class Fight:
             if lab[y - 1][x] == 0 or (lab[y - 1][x] != -1 and lab[y - 1][x] > cur):
                 self.has_path(x, y - 1, cur + 1, w, h, lab)
         return lab
+
+
+class Trap(pygame.sprite.Sprite):
+    def __init__(self, pos_x, pos_y):
+        super().__init__(bonus_group, all_sprites)
+        self.image = global_peremen.load_image('trap.png')
+        self.x = pos_x
+        self.y = pos_y
+        self.rect = self.image.get_rect().move(
+            tile_width * pos_x + 1, tile_height * pos_y + 50)
+        self.used = False
+
+    def buff(self, other):
+        if not self.used:
+            other.hp -= 10
+            self.image = global_peremen.load_image('trap2.png')
+            self.rect = self.image.get_rect().move(
+                tile_width * self.x + 10, tile_height * self.y + 30)
+            self.used = True
 
 
 class Key(pygame.sprite.Sprite):
@@ -499,10 +517,10 @@ class UI:
         pygame.draw.rect(surf, pygame.Color("green"), fill_rect)
         pygame.draw.rect(surf, pygame.Color("white"), outline_rect, 2)
 
-    def show_scores(self, surf, x, y, scores):
+    def show_scores(self, surf, x, y, score):
         pygame.font.init()
         f = pygame.font.Font(None, 36)
-        text = f.render(f'Scores: {scores}', True,
+        text = f.render(f'Score: {score}', True,
                         (255, 255, 255))
         surf.blit(text, (x, y))
         pygame.display.update()
