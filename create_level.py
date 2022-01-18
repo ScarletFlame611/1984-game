@@ -59,7 +59,7 @@ class Player(pygame.sprite.Sprite):
             self.start.append(global_peremen.load_image(f"start{i}.png"))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
-        self.hp = 150
+        self.hp = 400
         self.score = 0
         self.keys = 0
         self.instruments = 0
@@ -95,7 +95,6 @@ class Player(pygame.sprite.Sprite):
             hits = pygame.sprite.spritecollide(self, for_open, False)
             if hits:
                 for sprite in hits:
-                    print('here')
                     if pygame.sprite.collide_rect(sprite, sprite):
                         sprite.open(self)
             if pygame.sprite.spritecollideany(self, wall_group):
@@ -172,6 +171,12 @@ class Enemy(pygame.sprite.Sprite):
             self.image = self.fire[self.cur_frame]
         else:
             self.image = pygame.transform.flip(self.fire[self.cur_frame], True, False)
+        if self.hp <= 0:
+            global_peremen.MOD = 'play'
+            enemies_group.remove(self)
+            all_sprites.remove(self)
+            enemies.remove(self)
+            self.kill()
 
     def motion(self, x, y):
         self.rect.x = x * tile_width + 10
@@ -259,15 +264,21 @@ class Level:
     def __init__(self, matrix_name, colorkey=0):
         self.level = self.load_level(matrix_name)
         self.mouse_x, self.mouse_y = None, None
+        self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2, global_peremen.HIGH // 2, self.win())
         self.player_start_cd = 20
 
     def load_level(self, filename):
         global level_name
         level_name = filename
+        self.name = filename
         with open("data/levels/" + filename + ".txt", 'r') as mapFile:
             level_map = [line.strip() for line in mapFile]
         max_width = max(map(len, level_map))
         return list(map(lambda x: x.ljust(max_width, '.'), level_map))
+
+    def win(self):
+        global_peremen.levels[self.name] = max([player.score for player in player_group])
+        global_peremen.MOD = 'in_game_menu'
 
     def generate_level(self, number_of_level=0):
         player, x, y = None, None, None
@@ -313,6 +324,8 @@ class Level:
 
     def play(self, events):
         global EVENTS
+        if not [enemy for enemy in enemies]:
+            self.win_button.render(events=global_peremen.screen, events)
         EVENTS = events
         if global_peremen.MOD == "fight_start":
             for enemy in enemies:
@@ -642,7 +655,6 @@ class Safe(pygame.sprite.Sprite):
         self.used = False
 
     def open(self, other):
-        print('here')
         if other.keys > 0 and not self.used:
             self.used = True
             other.score += 100
@@ -760,7 +772,7 @@ class UI:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if global_peremen.MOD == "main_menu" or "level" in global_peremen.MOD:
+                if global_peremen.MOD == "in_game_menu" or "level" in global_peremen.MOD:
                     return
             for elem in btns:
                 elem.render(global_peremen.screen, events=events)
