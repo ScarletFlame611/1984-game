@@ -79,7 +79,8 @@ class Player(pygame.sprite.Sprite):
             self.start.append(global_peremen.load_image(f"start{i}.png"))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
-        self.hp = 400
+        self.max_hp = 250
+        self.hp = self.max_hp
         self.score = 0
         self.keys = 0
         self.instruments = 0
@@ -150,7 +151,7 @@ class Player(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, distation=5, damage=10):
+    def __init__(self, pos_x, pos_y, distation=5, damage=10, hp=150, cost=400):
         super().__init__(enemies_group, all_sprites)
         self.image = global_peremen.load_image(f"enemy/idle1.png")
         self.rect = self.image.get_rect().move(
@@ -160,13 +161,13 @@ class Enemy(pygame.sprite.Sprite):
             self.fire.append(global_peremen.load_image(f"enemy/fire{i}.png"))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
-        self.hp = 150
+        self.hp = hp
         self.in_fight = False
-        self.max_hp = 150
+        self.max_hp = hp
         self.range = distation
         self.cords = (pos_x, pos_y)
         self.damage = damage
-        self.cost = 400
+        self.cost = cost
 
     # передаются координаты сдвига врага и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
@@ -409,7 +410,7 @@ class Level:
         enemies_group.draw(global_peremen.screen)
         player_group.draw(global_peremen.screen)
         borders_group.draw(global_peremen.screen)
-        ui.draw_bar(global_peremen.screen, bar_x, bar_y, self.player.hp)
+        ui.draw_bar(global_peremen.screen, bar_x, bar_y, self.player)
         ui.draw_score(self.player.score)
         if not enemies:
             self.win_button.render(global_peremen.screen, events)
@@ -684,7 +685,7 @@ class Safe(pygame.sprite.Sprite):
     def open(self, other):
         if other.keys > 0 and not self.used:
             self.used = True
-            other.score += 100
+            other.score += 1000
             other.keys -= 1
             self.image = global_peremen.load_image('Safe1.png')
 
@@ -735,14 +736,15 @@ class UI:
         global_peremen.screen.blit(font,
                                    (0 + bar_x, 0 + self.bar_height + bar_x + global_peremen.WIDTH // 100))
 
-    def draw_bar(self, surf, x, y, player_hp):
-        if player_hp < 0:
+    def draw_bar(self, surf, x, y, player):
+        player_hp = player.hp
+        if player.hp < 0:
             player_hp = 0
-        if player_hp > 150:
-            player_hp = 150
+        if player.hp > player.max_hp:
+            player_hp = player.max_hp
         bar_width = 300
         self.bar_height = 10
-        fill = (player_hp / 150) * bar_width
+        fill = (player_hp / player.max_hp) * bar_width
         outline_rect = pygame.Rect(x, y, bar_width, self.bar_height)
         fill_rect = pygame.Rect(x, y, fill, self.bar_height)
         pygame.draw.rect(surf, pygame.Color(100, 230, 230), fill_rect)
@@ -754,7 +756,7 @@ class UI:
         if enemy_hp > max_hp:
             enemy_hp = max_hp
         bar_width = 300
-        fill = (enemy_hp / 150) * bar_width
+        fill = (enemy_hp / max_hp) * bar_width
         x = global_peremen.WIDTH - bar_width - global_peremen.WIDTH // 100
         y = 0 + self.bar_height + global_peremen.HIGH // 100
 
@@ -765,24 +767,33 @@ class UI:
 
     def draw_turns(self, turn, turns):
         text = str(turns)
-        font = pygame.font.Font(None, 100)
         if turn == "player":
-            font = font.render(text, True, (100, 230, 230))
+            font = global_peremen.big_font.render(text, True, (100, 230, 230))
         else:
-            font = font.render(text, True, (255, 100, 100))
+            font = global_peremen.big_font.render(text, True, (255, 100, 100))
         global_peremen.screen.blit(font, (global_peremen.WIDTH // 2 - font.get_width() // 2,
                                           0 + global_peremen.WIDTH // 100))
 
     def delete_level(self):
-        global all_sprites, tiles_group, player_group, wall_group, bonus_group, enemies_group
-        for elem in bonus_group:
-            elem.kill()
+        global FPS, v, start_frame, amount_of_frames, frames_per_second, all_sprites, tiles_group, player_group, wall_group, bonus_group, enemies_group, borders_group, coins, for_open, enemies, bar_x, bar_y, EVENTS, level_name
+        FPS = 60
+        v = 4  # скорость игрока
+        start_frame = time.time()
+        amount_of_frames = 8
+        frames_per_second = 8  # обновление кадров для анимации бега
         all_sprites = pygame.sprite.Group()
         tiles_group = pygame.sprite.Group()
         player_group = pygame.sprite.Group()
         wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
         bonus_group = pygame.sprite.Group()
         enemies_group = pygame.sprite.Group()
+        borders_group = pygame.sprite.Group()
+        coins = pygame.sprite.Group()
+        for_open = pygame.sprite.Group()
+        enemies = []  # группа для всех врагов
+        bar_x, bar_y = 10, 10
+        EVENTS = None
+        level_name = None
 
     def game_over(self):
         fon = pygame.transform.scale(global_peremen.load_image('bg.png'), (global_peremen.WIDTH, global_peremen.HIGH))

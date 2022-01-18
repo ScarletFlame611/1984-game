@@ -28,6 +28,15 @@ def all_saves():
         print('нет такого файла')
 
 
+def delete(id):
+    with open('data\saves.txt', 'r', newline='') as load:
+        loads = load.readlines()
+    with open('data\saves.txt', 'w', newline='') as load:
+        for i in range(len(loads)):
+            if i != id - 1:
+                load.write(loads[i])
+
+
 def clear():
     with open('data\saves.txt', 'w', newline=''):
         pass

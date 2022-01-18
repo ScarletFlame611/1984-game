@@ -8,6 +8,7 @@ MOD = 'main_menu'
 SIZE = WIDTH, HIGH = 900, 500
 screen = pygame.display.set_mode(SIZE)
 font = pygame.font.Font(None, min(SIZE) // 10)
+big_font = pygame.font.Font(None, min(SIZE) // 5)
 NAME = ''
 enter_nam = None
 choice_menu = None
