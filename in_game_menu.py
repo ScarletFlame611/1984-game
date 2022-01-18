@@ -15,14 +15,14 @@ class In_game_menu:
                     clicable = False
             if self.names[i] not in global_peremen.levels:
                 if clicable:
-                    self.buttons.append([self.names[i] + '. Score: ' + '0', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 1])
+                    self.buttons.append([self.names[i] + '. Score: ' + '0', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), i + 1])
                 else:
-                    self.buttons.append([self.names[i] + '. Score: ' + '0', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 1, 'clicable'])
+                    self.buttons.append([self.names[i] + '. Score: ' + '0', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), i + 1, 'clicable'])
             else:
                 if clicable:
-                    self.buttons.append([self.names[i] + '. Score: ' + str(global_peremen.levels[self.names[i]]), self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 1])
+                    self.buttons.append([self.names[i] + '. Score: ' + str(global_peremen.levels[self.names[i]]), self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), i + 1])
                 else:
-                    self.buttons.append([self.names[i] + '. Score: ' + str(global_peremen.levels[self.names[i]]), self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), 1, 'clicable'])
+                    self.buttons.append([self.names[i] + '. Score: ' + str(global_peremen.levels[self.names[i]]), self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), i + 1, 'clicable'])
         self.scroll = global_peremen.Scroll(self.buttons, 0 + global_peremen.WIDTH // 40, global_peremen.HIGH // 2)
         self.save = global_peremen.Button('save', global_peremen.WIDTH, 0, saves.save)
         self.save.x = global_peremen.WIDTH - self.save.w

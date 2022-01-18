@@ -34,7 +34,7 @@ class Choice_menu:
             sav = sav.split(',')
             for level in sav[:-1]:
                 global_peremen.levels[level.split(':')[0]] = level.split(':')[1]
-            global_peremen.NAME = sav[-1][:-1]
+            global_peremen.NAME = sav[-1]
             global_peremen.MOD = 'in_game_menu'
             global_peremen.choice_menu = None
             global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')

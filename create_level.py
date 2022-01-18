@@ -3,9 +3,9 @@ import sys
 import time
 import global_peremen
 import particles
+import saves
 
 pygame.init()
-pygame.display.set_caption('Обучение')
 FPS = 60
 v = 4  # скорость игрока
 start_frame = time.time()
@@ -23,8 +23,28 @@ for_open = pygame.sprite.Group()
 enemies = []  # группа для всех врагов
 bar_x, bar_y = 10, 10
 EVENTS = None
-coins = pygame.sprite.Group()
 level_name = None
+
+def setup():
+    global FPS, v, start_frame, amount_of_frames, frames_per_second, all_sprites, tiles_group, player_group, wall_group, bonus_group, enemies_group, borders_group, coins, for_open, enemies, bar_x, bar_y, EVENTS, level_name
+    FPS = 60
+    v = 4  # скорость игрока
+    start_frame = time.time()
+    amount_of_frames = 8
+    frames_per_second = 8  # обновление кадров для анимации бега
+    all_sprites = pygame.sprite.Group()
+    tiles_group = pygame.sprite.Group()
+    player_group = pygame.sprite.Group()
+    wall_group = pygame.sprite.Group()  # группа для остановки игрока при столкновении с ее объектами
+    bonus_group = pygame.sprite.Group()
+    enemies_group = pygame.sprite.Group()
+    borders_group = pygame.sprite.Group()
+    coins = pygame.sprite.Group()
+    for_open = pygame.sprite.Group()
+    enemies = []  # группа для всех врагов
+    bar_x, bar_y = 10, 10
+    EVENTS = None
+    level_name = None
 # загрузка изображения
 
 
@@ -146,6 +166,7 @@ class Enemy(pygame.sprite.Sprite):
         self.range = distation
         self.cords = (pos_x, pos_y)
         self.damage = damage
+        self.cost = 400
 
     # передаются координаты сдвига врага и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
@@ -163,7 +184,7 @@ class Enemy(pygame.sprite.Sprite):
     def attack(self, player):
         player.hp -= self.damage
 
-    def attack_update(self):
+    def attack_update(self, player):
         amount_of_frames = 6
         self.cur_frame = int(
             (time.time() - start_frame) * frames_per_second % amount_of_frames)
@@ -176,6 +197,7 @@ class Enemy(pygame.sprite.Sprite):
             enemies_group.remove(self)
             all_sprites.remove(self)
             enemies.remove(self)
+            player.score += self.cost
             self.kill()
 
     def motion(self, x, y):
@@ -262,23 +284,27 @@ class Coin(pygame.sprite.Sprite):
 
 class Level:
     def __init__(self, matrix_name, colorkey=0):
+        self.name = matrix_name[len('level'):]
         self.level = self.load_level(matrix_name)
         self.mouse_x, self.mouse_y = None, None
-        self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2, global_peremen.HIGH // 2, self.win())
+        self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2, global_peremen.HIGH // 2, self.win)
         self.player_start_cd = 20
 
     def load_level(self, filename):
         global level_name
         level_name = filename
-        self.name = filename
         with open("data/levels/" + filename + ".txt", 'r') as mapFile:
             level_map = [line.strip() for line in mapFile]
         max_width = max(map(len, level_map))
         return list(map(lambda x: x.ljust(max_width, '.'), level_map))
 
     def win(self):
-        global_peremen.levels[self.name] = max([player.score for player in player_group])
-        global_peremen.MOD = 'in_game_menu'
+        if int(global_peremen.levels[self.name]) < self.player.score:
+            global_peremen.levels[self.name] = self.player.score
+        global_peremen.MOD = 'win'
+        print(global_peremen.levels)
+        saves.save()
+        setup()
 
     def generate_level(self, number_of_level=0):
         player, x, y = None, None, None
@@ -324,8 +350,6 @@ class Level:
 
     def play(self, events):
         global EVENTS
-        if not [enemy for enemy in enemies]:
-            self.win_button.render(events=global_peremen.screen, events)
         EVENTS = events
         if global_peremen.MOD == "fight_start":
             for enemy in enemies:
@@ -387,6 +411,8 @@ class Level:
         borders_group.draw(global_peremen.screen)
         ui.draw_bar(global_peremen.screen, bar_x, bar_y, self.player.hp)
         ui.draw_score(self.player.score)
+        if not enemies:
+            self.win_button.render(global_peremen.screen, events)
 
         pygame.display.flip()
         global_peremen.clock.tick(FPS)
@@ -398,6 +424,7 @@ class Level:
             [1, 3, 5],
             (self.player.rect.x, self.player.rect.y + self.player.rect.height,
              self.player.rect.width, self.player.rect.height // 10))
+
 
 
 class Fight:
@@ -535,7 +562,7 @@ class Fight:
             self.player.attack_update()
             self.player_animation_cd -= 1
         if self.enemy_attack_cd != 0:
-            self.enemy.attack_update()
+            self.enemy.attack_update(self.player)
             self.enemy_attack_cd -= 1
         if self.player.hp <= 0:
             ui.game_over()

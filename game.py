@@ -46,6 +46,9 @@ def play():
             global_peremen.choice_menu.update(events)
         if global_peremen.MOD == 'settings':
             settings.settings.update(events)
+        if global_peremen.MOD == 'win':
+            global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
+            global_peremen.MOD = 'in_game_menu'
         global_peremen.clock.tick(global_peremen.fps)
         pygame.display.update()
 
