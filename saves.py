@@ -4,6 +4,8 @@ import global_peremen
 def save():
     with open('data\saves.txt', 'a', newline='') as save:
         if global_peremen.NAME != '':
+            for elem in global_peremen.levels:
+                save.write(str(elem) + ':' + str(global_peremen.levels[elem]) +',')
             save.write(str(global_peremen.NAME) + '\n')
 
 

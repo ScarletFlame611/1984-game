@@ -22,6 +22,8 @@ class Menu:
         global_peremen.choice_menu = None
         global_peremen.MOD = 'name_input'
         global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
+        for name in global_peremen.in_game_menu.names:
+            global_peremen.levels[name] = 0
 
     def close(self):
         pygame.quit()

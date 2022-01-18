@@ -19,6 +19,8 @@ def play():
         events = pygame.event.get()
         for event in events:
             if event.type == pygame.QUIT:
+                if global_peremen.MOD == 'in_game_menu' or global_peremen.MOD in ('play', 'fight_start', 'fight'):
+                    saves.save()
                 pygame.quit()
                 sys.exit()
         if global_peremen.MOD == 'main_menu':

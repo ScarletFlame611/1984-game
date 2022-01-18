@@ -17,6 +17,8 @@ ru_symbols = '0123456789йцукенгшщзхъфывапролджэячсми
 indexes = [48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 113, 119, 101, 114, 116, 121, 117, 105, 111, 112, 91, 93, 97, 115, 100, 102, 103, 104, 106, 107, 108, 59, 39, 122, 120, 99, 118, 98, 110, 109, 44, 46]
 run = True
 new_game = True
+levels = {}
+index = None
 
 
 def load_image(name, colorkey=None):
@@ -39,6 +41,8 @@ class Button:
         self.clicable = clicable
         self.cd = 30
         if name_image is not None:
+            if size[0] < self.font.get_width():
+                size = self.font.get_width(), size[1]
             self.image = pygame.transform.scale(load_image(name_image, colorkey=-1), size)
             self.size = self.w, self.h = size[0], size[1]
         else:
@@ -101,14 +105,18 @@ class Scroll:
         past_x = 0
         past_y = 0
         for char in buttons:
+            clicable=True
+            if char[-1] == 'clicable':
+                clicable = False
+                char = char[:-1]
             if len(char) == 4:
-                self.buttons.append(Button(char[0], x, y, char[1], name_image=char[2], size=char[3]))
+                self.buttons.append(Button(char[0], x, y, char[1], name_image=char[2], size=char[3], clicable=clicable))
             elif len(char) == 3:
-                self.buttons.append(Button(char[0], x, y, char[1], function_peremen=[char[2]]))
+                self.buttons.append(Button(char[0], x, y, char[1], function_peremen=[char[2]], clicable=clicable))
             elif len(char) == 5:
-                self.buttons.append(Button(char[0], x, y, char[1], name_image=char[2], size=char[3], function_peremen=[char[4]]))
+                self.buttons.append(Button(char[0], x, y, char[1], name_image=char[2], size=char[3], function_peremen=[char[4]], clicable=clicable))
             else:
-                self.buttons.append(Button(char[0], x, y, char[1]))
+                self.buttons.append(Button(char[0], x, y, char[1], clicable=clicable))
         for i in range(len(self.buttons)):
             if mod == 'horizontal':
                 self.buttons[i].x = past_x + self.step

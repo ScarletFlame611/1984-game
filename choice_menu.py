@@ -9,7 +9,7 @@ class Choice_menu:
         self.close = global_peremen.Button('close', global_peremen.WIDTH, 0, self.close)
         self.close.x = self.close.x - self.close.w
         for save in saves_:
-            save = save.split('/')
+            save = save.split(',')
             buttons.append((save[-1][:-1] + '-' + str(id), self.load, id))
             id += 1
         if buttons:
@@ -29,8 +29,11 @@ class Choice_menu:
 
     def load(self, id):
         sav = saves.load(id)
+        global_peremen.index = id
         if sav is not None:
-            sav = sav.split('/')
+            sav = sav.split(',')
+            for level in sav[:-1]:
+                global_peremen.levels[level.split(':')[0]] = level.split(':')[1]
             global_peremen.NAME = sav[-1][:-1]
             global_peremen.MOD = 'in_game_menu'
             global_peremen.choice_menu = None
