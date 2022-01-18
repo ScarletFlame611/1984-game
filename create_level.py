@@ -818,12 +818,13 @@ class UI:
             global_peremen.clock.tick(FPS)
 
     def again(self):
-        self.delete_level()
         global_peremen.MOD = level_name
+        self.delete_level()
 
     def back(self):
         global_peremen.in_game_menu.mod = 'menu'
         global_peremen.MOD = "in_game_menu"
+        self.pause = False
         self.delete_level()
 
     def resume(self):
