@@ -85,6 +85,7 @@ class Player(pygame.sprite.Sprite):
         self.keys = 0
         self.instruments = 0
         self.is_start = False
+        self.damag_k = 20
 
     # передаются координаты сдвига игрока и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
@@ -193,6 +194,8 @@ class Enemy(pygame.sprite.Sprite):
             self.image = self.fire[self.cur_frame]
         else:
             self.image = pygame.transform.flip(self.fire[self.cur_frame], True, False)
+
+    def check_death(self, player):
         if self.hp <= 0:
             global_peremen.MOD = 'play'
             enemies_group.remove(self)
@@ -366,7 +369,7 @@ class Level:
                     self.fight.motion(event.pos[0] // tile_width, event.pos[1] // tile_height)
             if event.type == pygame.KEYDOWN and global_peremen.MOD == "fight":
                 if event.key == pygame.K_k:
-                    self.fight.attack(5, 5, 1)
+                    self.fight.attack('k', 5, 1)
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     ui.menu_esc()
@@ -550,6 +553,7 @@ class Fight:
             self.enemy_attack_cd = 0
 
     def update(self):
+        self.enemy.check_death(self.player)
         if self.player_count <= 0:
             self.enemy_count = 5
             self.player_count = 5
@@ -595,7 +599,9 @@ class Fight:
                 self.has_path(x, y - 1, cur + 1, w, h, lab)
         return lab
 
-    def attack(self, damage, radius, mana):
+    def attack(self, damage_mod, radius, mana):
+        if damage_mod == 'k':
+            damage = self.player.damag_k
         if self.mod == "player":
             x, y = self.enemy.cords[0], self.enemy.cords[1]
             path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)[y][x]

@@ -14,6 +14,7 @@ class In_game_menu:
                 if self.buttons[i - 1][0].split()[-1] == '0':
                     clicable = False
             if self.names[i] not in global_peremen.levels:
+                global_peremen.levels[self.names[i]] = '0'
                 if clicable:
                     self.buttons.append([self.names[i] + '. Score: ' + '0', self.open_level, map_image_name, (global_peremen.WIDTH // 5, global_peremen.HIGH // 5), int(self.names[i])])
                 else:
