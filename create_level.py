@@ -246,7 +246,7 @@ class HealTile(pygame.sprite.Sprite):
         self.used = False
 
     def buff(self, other):
-        if not self.used and other.hp < 150:
+        if not self.used and other.hp < other.max_hp:
             other.hp += 30
             self.used = True
             color = pygame.Color(100, 100, 100)
@@ -352,6 +352,7 @@ class Level:
     def play(self, events):
         global EVENTS
         EVENTS = events
+        global_peremen.screen.fill(pygame.Color(0, 0, 255))
         if global_peremen.MOD == "fight_start":
             for enemy in enemies:
                 if enemy.in_fight:
@@ -395,7 +396,7 @@ class Level:
         for enemy in enemies_group:
             enemy.update(self.player.rect.x)
 
-        global_peremen.screen.fill("black")
+        global_peremen.screen.fill("blue")
 
         tiles_group.draw(global_peremen.screen)
         particles.particles.draw(global_peremen.screen)
