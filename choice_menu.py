@@ -13,7 +13,7 @@ class Choice_menu:
         self.delete.x -= self.delete.w
         for save in saves_:
             save = save.split(',')
-            buttons.append((save[-1][:-1] + '-' + str(id), self.load, id))
+            buttons.append((save[-1][:-2] + '-' + str(id), self.load, id))
             id += 1
         if buttons:
             self.scroll = global_peremen.Scroll(buttons, global_peremen.WIDTH // 2, global_peremen.HIGH // 2)
@@ -52,7 +52,7 @@ class Choice_menu:
                 sav = sav.split(',')
                 for level in sav[:-1]:
                     global_peremen.levels[level.split(':')[0]] = level.split(':')[1]
-                global_peremen.NAME = sav[-1]
+                global_peremen.NAME = sav[-1][:-1]
                 global_peremen.MOD = 'in_game_menu'
                 global_peremen.choice_menu = None
                 global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
