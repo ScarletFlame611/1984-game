@@ -25,6 +25,7 @@ bar_x, bar_y = 10, 10
 EVENTS = None
 level_name = None
 
+
 def setup():
     global FPS, v, start_frame, amount_of_frames, frames_per_second, all_sprites, tiles_group, player_group, wall_group, bonus_group, enemies_group, borders_group, coins, for_open, enemies, bar_x, bar_y, EVENTS, level_name
     FPS = 60
@@ -45,6 +46,8 @@ def setup():
     bar_x, bar_y = 10, 10
     EVENTS = None
     level_name = None
+
+
 # загрузка изображения
 
 
@@ -181,7 +184,8 @@ class Enemy(pygame.sprite.Sprite):
         if self.current_state == "right":
             self.image = global_peremen.load_image(f"enemy/idle1.png")
         else:
-            self.image = pygame.transform.flip(global_peremen.load_image(f"enemy/idle1.png"), True, False)
+            self.image = pygame.transform.flip(global_peremen.load_image(f"enemy/idle1.png"), True,
+                                               False)
 
     def attack(self, player):
         player.hp -= self.damage
@@ -291,7 +295,8 @@ class Level:
         self.name = matrix_name[len('level'):]
         self.level = self.load_level(matrix_name)
         self.mouse_x, self.mouse_y = None, None
-        self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2, global_peremen.HIGH // 2, self.win)
+        self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2,
+                                                global_peremen.HIGH // 2, self.win)
         self.player_start_cd = 20
 
     def load_level(self, filename):
@@ -400,7 +405,10 @@ class Level:
             enemy.update(self.player.rect.x)
 
         global_peremen.screen.fill("blue")
-
+        camera = Camera()
+        camera.update(self.player)
+        for sprite in all_sprites:
+            camera.apply(sprite)
         tiles_group.draw(global_peremen.screen)
         particles.particles.draw(global_peremen.screen)
         particles.particles.update()
@@ -431,6 +439,22 @@ class Level:
              self.player.rect.width, self.player.rect.height // 10))
 
 
+class Camera:
+    # зададим начальный сдвиг камеры
+    def __init__(self):
+        self.dx = 0
+        self.dy = 0
+
+    # сдвинуть объект obj на смещение камеры
+    def apply(self, obj):
+        obj.rect.x += self.dx
+        obj.rect.y += self.dy
+
+    # позиционировать камеру на объекте target
+    def update(self, target):
+        self.dx = -(target.rect.x + target.rect.w // 2 - global_peremen.WIDTH // 2)
+        self.dy = -(target.rect.y + target.rect.h // 2 - global_peremen.HIGH // 2)
+
 
 class Fight:
     def __init__(self, player, enemy, level):
@@ -458,7 +482,8 @@ class Fight:
         x = global_peremen.WIDTH // tile_width
         y = global_peremen.HIGH // tile_height
         self.create_lab()
-        path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)
+        path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h,
+                             self.lab)
         for x1 in range(x):
             for y1 in range(y):
                 color_light = pygame.Color(230, 230, 230)
@@ -482,15 +507,18 @@ class Fight:
 
     def motion(self, x, y):
         if self.mod == "player":
-            path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)
-            if not (x == self.player.rect.x // tile_width and y == self.player.rect.y // tile_height):
+            path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h,
+                                 self.lab)
+            if not (
+                    x == self.player.rect.x // tile_width and y == self.player.rect.y // tile_height):
                 self.create_lab()
                 if self.is_path(x, y, path) and not (self.enemy.rect.x // tile_width == x and
                                                      self.enemy.rect.y // tile_height == y):
                     self.player.rect.x = x * tile_width + 10
                     self.player.rect.y = y * tile_height + 5
                     self.player_count -= \
-                        self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)[y][x]
+                        self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h,
+                                      self.lab)[y][x]
                     play_x = self.player.rect.x // tile_width
                     play_y = self.player.rect.y // tile_height
                     self.player_cords = (play_x, play_y)
@@ -604,7 +632,10 @@ class Fight:
             damage = self.player.damag_k
         if self.mod == "player":
             x, y = self.enemy.cords[0], self.enemy.cords[1]
-            path = self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h, self.lab)[y][x]
+            path = \
+                self.has_path(self.player_cords[0], self.player_cords[1], 0, self.w, self.h,
+                              self.lab)[
+                    y][x]
             if path <= radius:
                 self.player.attack(self.enemy, damage)
                 self.player_animation_cd = 5
@@ -625,8 +656,8 @@ class Trap(pygame.sprite.Sprite):
         if not self.used:
             other.hp -= 10
             self.image = global_peremen.load_image('trap2.png')
-            self.rect = self.image.get_rect().move(
-                tile_width * self.x + 10, tile_height * self.y + 30)
+            self.rect.x += 10
+            self.rect.y -= 20
             self.used = True
 
 
@@ -741,7 +772,8 @@ class UI:
         font = pygame.font.Font(None, 25)
         font = font.render(text, True, (100, 220, 220))
         global_peremen.screen.blit(font,
-                                   (0 + bar_x, 0 + self.bar_height + bar_x + global_peremen.WIDTH // 100))
+                                   (0 + bar_x,
+                                    0 + self.bar_height + bar_x + global_peremen.WIDTH // 100))
 
     def draw_bar(self, surf, x, y, player):
         player_hp = player.hp
@@ -803,13 +835,16 @@ class UI:
         level_name = None
 
     def game_over(self):
-        fon = pygame.transform.scale(global_peremen.load_image('bg.png'), (global_peremen.WIDTH, global_peremen.HIGH))
+        fon = pygame.transform.scale(global_peremen.load_image('bg.png'),
+                                     (global_peremen.WIDTH, global_peremen.HIGH))
         global_peremen.screen.blit(fon, (0, 0))
         again = global_peremen.Button("Start over", global_peremen.WIDTH // 2,
-                                      global_peremen.HIGH // 2 - global_peremen.HIGH // 10, self.again)
+                                      global_peremen.HIGH // 2 - global_peremen.HIGH // 10,
+                                      self.again)
 
         back = global_peremen.Button("Back", global_peremen.WIDTH // 2,
-                                     global_peremen.HIGH // 2 + global_peremen.HIGH // 10, self.back)
+                                     global_peremen.HIGH // 2 + global_peremen.HIGH // 10,
+                                     self.back)
         btns = [again, back]
         while True:
             events = pygame.event.get()
@@ -839,10 +874,12 @@ class UI:
 
     def menu_esc(self):
         self.pause = True
-        fon = pygame.transform.scale(global_peremen.load_image('bg.png'), (global_peremen.WIDTH, global_peremen.HIGH))
+        fon = pygame.transform.scale(global_peremen.load_image('bg.png'),
+                                     (global_peremen.WIDTH, global_peremen.HIGH))
         global_peremen.screen.blit(fon, (0, 0))
         again = global_peremen.Button("Start over", global_peremen.WIDTH // 2,
-                                      global_peremen.HIGH // 2 - global_peremen.HIGH // 6, self.again)
+                                      global_peremen.HIGH // 2 - global_peremen.HIGH // 6,
+                                      self.again)
         contin = global_peremen.Button("Continue", global_peremen.WIDTH // 2,
                                        global_peremen.HIGH // 2, self.resume)
 
