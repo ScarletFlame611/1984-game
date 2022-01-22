@@ -155,14 +155,17 @@ class Player(pygame.sprite.Sprite):
 
 
 class Enemy(pygame.sprite.Sprite):
-    def __init__(self, pos_x, pos_y, distation=5, damage=10, hp=150, cost=400):
+    def __init__(self, pos_x, pos_y, folder_name, amount_fire, distation=5, damage=10, hp=150, cost=400, speed=5):
         super().__init__(enemies_group, all_sprites)
-        self.image = global_peremen.load_image(f"enemy/idle1.png")
+        self.folder = folder_name
+        self.image = global_peremen.load_image(f"{folder_name}/idle1.png")
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y + 5)
         self.fire = []
-        for i in range(1, 7):
-            self.fire.append(global_peremen.load_image(f"enemy/fire{i}.png"))
+        self.fires_frames = amount_fire
+        self.speed = speed
+        for i in range(1, amount_fire + 1):
+            self.fire.append(global_peremen.load_image(f"{folder_name}/fire{i}.png"))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
         self.hp = hp
@@ -182,16 +185,16 @@ class Enemy(pygame.sprite.Sprite):
             global_peremen.MOD = "fight_start"
         self.current_state = "right" if x_player > self.rect.x else "left"
         if self.current_state == "right":
-            self.image = global_peremen.load_image(f"enemy/idle1.png")
+            self.image = global_peremen.load_image(f"{self.folder}/idle1.png")
         else:
-            self.image = pygame.transform.flip(global_peremen.load_image(f"enemy/idle1.png"), True,
+            self.image = pygame.transform.flip(global_peremen.load_image(f"{self.folder}/idle1.png"), True,
                                                False)
 
     def attack(self, player):
         player.hp -= self.damage
 
     def attack_update(self, player):
-        amount_of_frames = 6
+        amount_of_frames = self.fires_frames
         self.cur_frame = int(
             (time.time() - start_frame) * frames_per_second % amount_of_frames)
         if self.current_state == "right":
@@ -329,9 +332,12 @@ class Level:
                 elif self.level[y][x] == '$':
                     Tile('empty', x, y)
                     Coin(x, y)
-                elif self.level[y][x] == "&":
+                elif self.level[y][x] == "1":
                     Tile('empty', x, y)
-                    enemies.append(Enemy(x, y))
+                    enemies.append(Enemy(x, y, "enemy1", 6, damage=15, distation=5))
+                elif self.level[y][x] == "2":
+                    Tile('empty', x, y)
+                    enemies.append(Enemy(x, y, "enemy2", 4, damage=50, distation=1, hp=300, speed=4))
                 elif self.level[y][x] == '@':
                     Tile('empty', x, y)
                     player = Player(x, y)
@@ -472,7 +478,7 @@ class Fight:
         self.player.rect.y = play_y * tile_height + 5
         self.mod = "player"
         self.player_count = 5
-        self.enemy_count = 5
+        self.enemy_count = self.enemy.speed
         global_peremen.MOD = "fight"
         self.enemy_attack_cd = 0
         self.player_animation_cd = 0
@@ -583,7 +589,7 @@ class Fight:
     def update(self):
         self.enemy.check_death(self.player)
         if self.player_count <= 0:
-            self.enemy_count = 5
+            self.enemy_count = self.enemy.speed
             self.player_count = 5
             self.mod = 'enemy'
         if self.mod == "player":
