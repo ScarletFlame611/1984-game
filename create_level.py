@@ -6,8 +6,7 @@ import particles
 import saves
 tile_width = tile_height = 70
 player_enemy_width, player_enemy_height = tile_width - (tile_width // 5), tile_height - (tile_height // 5)
-keys_coins_width, keys_coins_height = tile_width - (tile_width // 3), tile_height - (tile_height // 3)
-print(player_enemy_width, player_enemy_height)
+keys_coins_width, keys_coins_height = tile_width - (tile_width // 2), tile_height - (tile_height // 2)
 
 
 pygame.init()
@@ -55,7 +54,6 @@ def setup():
     enemies = []  # группа для всех врагов
     bar_x, bar_y = 10, 10
     EVENTS = None
-    level_name = None
     player_enemy_width, player_enemy_height = tile_width - (tile_width // 5), tile_height - (tile_height // 5)
     tile_images = {
         'wall': pygame.transform.scale(global_peremen.load_image('box.png'), (tile_width, tile_height)),
@@ -93,7 +91,7 @@ class Player(pygame.sprite.Sprite):
         self.keys = 0
         self.instruments = 0
         self.is_start = False
-        self.damag_k = 20
+        self.damag_k = 100
 
     # передаются координаты сдвига игрока и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
@@ -303,11 +301,9 @@ class Level:
         global tile_width, tile_height
         self.name = matrix_name[len('level'):]
         self.level = self.load_level(matrix_name)
-        print('retail')
         tile_height = global_peremen.HIGH // len(self.level)
         tile_width = global_peremen.WIDTH // len(self.level[0])
         setup()
-        print(player_enemy_width, player_enemy_height)
         self.mouse_x, self.mouse_y = None, None
         self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2,
                                                 global_peremen.HIGH // 2, self.win)
@@ -640,19 +636,18 @@ class Fight:
 class Trap(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(bonus_group, all_sprites)
-        self.image = pygame.transform.scale(global_peremen.load_image('trap.png'), (player_enemy_width, player_enemy_height))
+        self.image = pygame.transform.scale(global_peremen.load_image('trap.png'), (keys_coins_width, keys_coins_height - (keys_coins_height // 3)))
         self.x = pos_x
         self.y = pos_y
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + player_enemy_width // 7, tile_height * pos_y + player_enemy_height // 7)
+            tile_width * pos_x + keys_coins_width // 3, tile_height * (pos_y + 1) - (keys_coins_height - (keys_coins_height // 3)))
         self.used = False
 
     def buff(self, other):
         if not self.used:
             other.hp -= 10
-            self.image = pygame.transform.scale(global_peremen.load_image('trap2.png'), (player_enemy_width, player_enemy_height))
-            self.rect.x += 10
-            self.rect.y -= 20
+            self.image = pygame.transform.scale(global_peremen.load_image('trap2.png'), (keys_coins_width, keys_coins_height))
+            self.rect.y -= (keys_coins_height // 3)
             self.used = True
 
 
@@ -675,9 +670,9 @@ class Key(pygame.sprite.Sprite):
 class Instrument(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(bonus_group, all_sprites)
-        self.image = pygame.transform.scale(global_peremen.load_image('key2.png'), (player_enemy_width, player_enemy_height))
+        self.image = pygame.transform.scale(global_peremen.load_image('key2.png'), (keys_coins_width, keys_coins_height))
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + 20, tile_height * pos_y + 15)
+            tile_width * pos_x + keys_coins_width // 4, tile_height * pos_y + keys_coins_height // 5)
         self.used = False
 
     def buff(self, other):
@@ -855,7 +850,9 @@ class UI:
             global_peremen.clock.tick(FPS)
 
     def again(self):
+        print(global_peremen.MOD)
         global_peremen.MOD = level_name
+        print(global_peremen.MOD)
         self.delete_level()
 
     def back(self):
@@ -888,10 +885,10 @@ class UI:
                 if event.type == pygame.QUIT:
                     pygame.quit()
                     sys.exit()
-                if global_peremen.MOD == "main_menu" or "level" in global_peremen.MOD:
-                    return
-                if not self.pause:
-                    return
+            if global_peremen.MOD == "main_menu" or "level" in global_peremen.MOD:
+                return
+            if not self.pause:
+                return
             for elem in btns:
                 elem.render(global_peremen.screen, events=events)
             pygame.display.flip()
