@@ -4,6 +4,11 @@ import time
 import global_peremen
 import particles
 import saves
+tile_width = tile_height = 70
+player_enemy_width, player_enemy_height = tile_width - (tile_width // 5), tile_height - (tile_height // 5)
+keys_coins_width, keys_coins_height = tile_width - (tile_width // 3), tile_height - (tile_height // 3)
+print(player_enemy_width, player_enemy_height)
+
 
 pygame.init()
 FPS = 60
@@ -24,10 +29,15 @@ enemies = []  # группа для всех врагов
 bar_x, bar_y = 10, 10
 EVENTS = None
 level_name = None
+tile_images = {
+    'wall': pygame.transform.scale(global_peremen.load_image('box.png'), (tile_width, tile_height)),
+    'empty': pygame.transform.scale(global_peremen.load_image('floor.png'), (tile_width, tile_height))
+}
+player_image = global_peremen.load_image('player.png')
 
 
 def setup():
-    global FPS, v, start_frame, amount_of_frames, frames_per_second, all_sprites, tiles_group, player_group, wall_group, bonus_group, enemies_group, borders_group, coins, for_open, enemies, bar_x, bar_y, EVENTS, level_name
+    global FPS, v, start_frame, amount_of_frames, frames_per_second, all_sprites, tiles_group, player_group, wall_group, bonus_group, enemies_group, borders_group, coins, for_open, enemies, bar_x, bar_y, EVENTS, level_name, player_image, tile_images, player_enemy_height, player_enemy_width, keys_coins_width, keys_coins_height
     FPS = 60
     v = 4  # скорость игрока
     start_frame = time.time()
@@ -46,18 +56,13 @@ def setup():
     bar_x, bar_y = 10, 10
     EVENTS = None
     level_name = None
-
-
-# загрузка изображения
-
-
-tile_images = {
-    'wall': global_peremen.load_image('box.png'),
-    'empty': global_peremen.load_image('floor.png')
-}
-player_image = global_peremen.load_image('player.png')
-
-tile_width = tile_height = 70
+    player_enemy_width, player_enemy_height = tile_width - (tile_width // 5), tile_height - (tile_height // 5)
+    tile_images = {
+        'wall': pygame.transform.scale(global_peremen.load_image('box.png'), (tile_width, tile_height)),
+        'empty': pygame.transform.scale(global_peremen.load_image('floor.png'), (tile_width, tile_height))
+    }
+    player_image = pygame.transform.scale(global_peremen.load_image('player.png'), (player_enemy_width, player_enemy_height))
+    keys_coins_width, keys_coins_height = tile_width - (tile_width // 3), tile_height - (tile_height // 3)
 
 
 # класс игрока
@@ -66,20 +71,20 @@ class Player(pygame.sprite.Sprite):
         super().__init__(player_group, all_sprites)
         self.image = player_image
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + 10, tile_height * pos_y + 5)
+            tile_width * pos_x + player_enemy_width // 7, tile_height * pos_y + player_enemy_height // 7)
         self.image = None
         self.runframes = []
         self.goframes = []
         self.fire = []
         self.start = []
         for i in range(1, 9):
-            self.runframes.append(global_peremen.load_image(f"run{i}.png"))
+            self.runframes.append(pygame.transform.scale(global_peremen.load_image(f"run{i}.png"), (player_enemy_width, player_enemy_height)))
         for i in range(1, 7):
-            self.goframes.append(global_peremen.load_image(f"go{i}.png"))
+            self.goframes.append(pygame.transform.scale(global_peremen.load_image(f"go{i}.png"), (player_enemy_width, player_enemy_height)))
         for i in range(1, 6):
-            self.fire.append(global_peremen.load_image(f"fire{i}.png"))
+            self.fire.append(pygame.transform.scale(global_peremen.load_image(f"fire{i}.png"), (player_enemy_width, player_enemy_height)))
         for i in range(1, 8):
-            self.start.append(global_peremen.load_image(f"start{i}.png"))
+            self.start.append(pygame.transform.scale(global_peremen.load_image(f"start{i}.png"), (player_enemy_width, player_enemy_height)))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
         self.max_hp = 250
@@ -158,14 +163,14 @@ class Enemy(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y, folder_name, amount_fire, distation=5, damage=10, hp=150, cost=400, speed=5):
         super().__init__(enemies_group, all_sprites)
         self.folder = folder_name
-        self.image = global_peremen.load_image(f"{folder_name}/idle1.png")
+        self.image = pygame.transform.scale(global_peremen.load_image(f"{folder_name}/idle1.png"), (player_enemy_width, player_enemy_height))
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x, tile_height * pos_y + 5)
+            tile_width * pos_x + player_enemy_height // 7, tile_height * pos_y + player_enemy_height // 7)
         self.fire = []
         self.fires_frames = amount_fire
         self.speed = speed
         for i in range(1, amount_fire + 1):
-            self.fire.append(global_peremen.load_image(f"{folder_name}/fire{i}.png"))
+            self.fire.append(pygame.transform.scale(global_peremen.load_image(f"{folder_name}/fire{i}.png"), (player_enemy_width, player_enemy_height)))
         self.cur_frame = 0
         self.current_state = "right"  # текущее направление, куда смотрит игрок
         self.hp = hp
@@ -185,9 +190,9 @@ class Enemy(pygame.sprite.Sprite):
             global_peremen.MOD = "fight_start"
         self.current_state = "right" if x_player > self.rect.x else "left"
         if self.current_state == "right":
-            self.image = global_peremen.load_image(f"{self.folder}/idle1.png")
+            self.image = pygame.transform.scale(global_peremen.load_image(f"{self.folder}/idle1.png"), (player_enemy_width, player_enemy_height))
         else:
-            self.image = pygame.transform.flip(global_peremen.load_image(f"{self.folder}/idle1.png"), True,
+            self.image = pygame.transform.flip(pygame.transform.scale(global_peremen.load_image(f"{self.folder}/idle1.png"), (player_enemy_width, player_enemy_height)), True,
                                                False)
 
     def attack(self, player):
@@ -223,7 +228,7 @@ class Enemy(pygame.sprite.Sprite):
 class Tile(pygame.sprite.Sprite):
     def __init__(self, tile_type, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
-        self.image = tile_images[tile_type]
+        self.image = pygame.transform.scale(tile_images[tile_type], (tile_width, tile_height))
         if tile_type == "wall":
             self.add(wall_group)
         self.rect = self.image.get_rect().move(
@@ -250,7 +255,7 @@ class HealTile(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.add(bonus_group)
-        self.image = global_peremen.load_image('heal.png')
+        self.image = pygame.transform.scale(global_peremen.load_image('heal.png'), (tile_width, tile_height))
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.used = False
@@ -262,7 +267,7 @@ class HealTile(pygame.sprite.Sprite):
             color = pygame.Color(100, 100, 100)
             colorImage = pygame.Surface(self.image.get_size()).convert_alpha()
             colorImage.fill(color)
-            self.image.blit(colorImage, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+            pygame.transform.scale(self.image, (tile_width, tile_height)).blit(colorImage, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
 
 class Coin(pygame.sprite.Sprite):
@@ -273,9 +278,9 @@ class Coin(pygame.sprite.Sprite):
         for i in range(1, 7):
             self.frames.append(global_peremen.load_image(f"coin{i}.png"))
         self.cur_frame = 0
-        self.image = self.frames[self.cur_frame]
+        self.image = pygame.transform.scale(self.frames[self.cur_frame], (keys_coins_width, keys_coins_height))
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + 20, tile_height * pos_y + 15)
+            tile_width * pos_x + player_enemy_height // 3, tile_height * pos_y + player_enemy_height // 6)
         self.used = False
 
     def update(self):
@@ -295,8 +300,14 @@ class Coin(pygame.sprite.Sprite):
 
 class Level:
     def __init__(self, matrix_name, colorkey=0):
+        global tile_width, tile_height
         self.name = matrix_name[len('level'):]
         self.level = self.load_level(matrix_name)
+        print('retail')
+        tile_height = global_peremen.HIGH // len(self.level)
+        tile_width = global_peremen.WIDTH // len(self.level[0])
+        setup()
+        print(player_enemy_width, player_enemy_height)
         self.mouse_x, self.mouse_y = None, None
         self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2,
                                                 global_peremen.HIGH // 2, self.win)
@@ -314,7 +325,6 @@ class Level:
         if int(global_peremen.levels[self.name]) < self.player.score:
             global_peremen.levels[self.name] = self.player.score
         global_peremen.MOD = 'win'
-        print(global_peremen.levels)
         saves.save()
         setup()
 
@@ -411,10 +421,6 @@ class Level:
             enemy.update(self.player.rect.x)
 
         global_peremen.screen.fill("blue")
-        camera = Camera()
-        camera.update(self.player)
-        for sprite in all_sprites:
-            camera.apply(sprite)
         tiles_group.draw(global_peremen.screen)
         particles.particles.draw(global_peremen.screen)
         particles.particles.update()
@@ -443,23 +449,6 @@ class Level:
             [1, 3, 5],
             (self.player.rect.x, self.player.rect.y + self.player.rect.height,
              self.player.rect.width, self.player.rect.height // 10))
-
-
-class Camera:
-    # зададим начальный сдвиг камеры
-    def __init__(self):
-        self.dx = 0
-        self.dy = 0
-
-    # сдвинуть объект obj на смещение камеры
-    def apply(self, obj):
-        obj.rect.x += self.dx
-        obj.rect.y += self.dy
-
-    # позиционировать камеру на объекте target
-    def update(self, target):
-        self.dx = -(target.rect.x + target.rect.w // 2 - global_peremen.WIDTH // 2)
-        self.dy = -(target.rect.y + target.rect.h // 2 - global_peremen.HIGH // 2)
 
 
 class Fight:
@@ -651,17 +640,17 @@ class Fight:
 class Trap(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(bonus_group, all_sprites)
-        self.image = global_peremen.load_image('trap.png')
+        self.image = pygame.transform.scale(global_peremen.load_image('trap.png'), (player_enemy_width, player_enemy_height))
         self.x = pos_x
         self.y = pos_y
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + 1, tile_height * pos_y + 50)
+            tile_width * pos_x + player_enemy_width // 7, tile_height * pos_y + player_enemy_height // 7)
         self.used = False
 
     def buff(self, other):
         if not self.used:
             other.hp -= 10
-            self.image = global_peremen.load_image('trap2.png')
+            self.image = pygame.transform.scale(global_peremen.load_image('trap2.png'), (player_enemy_width, player_enemy_height))
             self.rect.x += 10
             self.rect.y -= 20
             self.used = True
@@ -670,9 +659,9 @@ class Trap(pygame.sprite.Sprite):
 class Key(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(bonus_group, all_sprites)
-        self.image = global_peremen.load_image('key.png')
+        self.image = pygame.transform.scale(global_peremen.load_image('key.png'), ((keys_coins_width, keys_coins_height)))
         self.rect = self.image.get_rect().move(
-            tile_width * pos_x + 20, tile_height * pos_y + 15)
+            tile_width * pos_x + keys_coins_width // 3, tile_height * pos_y + keys_coins_height // 6)
         self.used = False
 
     def buff(self, other):
@@ -686,7 +675,7 @@ class Key(pygame.sprite.Sprite):
 class Instrument(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(bonus_group, all_sprites)
-        self.image = global_peremen.load_image('key2.png')
+        self.image = pygame.transform.scale(global_peremen.load_image('key2.png'), (player_enemy_width, player_enemy_height))
         self.rect = self.image.get_rect().move(
             tile_width * pos_x + 20, tile_height * pos_y + 15)
         self.used = False
@@ -703,7 +692,7 @@ class Panel(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.add(for_open)
-        self.image = global_peremen.load_image('broken_panel.jpg')
+        self.image = pygame.transform.scale(global_peremen.load_image('broken_panel.jpg'), (tile_width, tile_height))
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.used = False
@@ -713,7 +702,7 @@ class Panel(pygame.sprite.Sprite):
             self.used = True
             other.score += 100
             other.instruments -= 1
-            self.image = global_peremen.load_image('panel.jpg')
+            self.image = pygame.transform.scale(global_peremen.load_image('panel.jpg'), (tile_width, tile_height))
 
 
 class Safe(pygame.sprite.Sprite):
@@ -721,7 +710,7 @@ class Safe(pygame.sprite.Sprite):
         super().__init__(tiles_group, all_sprites)
         self.add(for_open)
         self.add(wall_group)
-        self.image = global_peremen.load_image('Safe.png')
+        self.image = pygame.transform.scale(global_peremen.load_image('Safe.png'), (tile_width, tile_height))
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.used = False
@@ -731,14 +720,14 @@ class Safe(pygame.sprite.Sprite):
             self.used = True
             other.score += 1000
             other.keys -= 1
-            self.image = global_peremen.load_image('Safe1.png')
+            self.image = pygame.transform.scale(global_peremen.load_image('Safe1.png'), (tile_width, tile_height))
 
 
 class Speed_Up(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.add(bonus_group)
-        self.image = global_peremen.load_image('fast.png')
+        self.image = pygame.transform.scale(global_peremen.load_image('fast.png'), (tile_width, tile_height))
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.used = False
@@ -754,7 +743,7 @@ class Speed_Down(pygame.sprite.Sprite):
     def __init__(self, pos_x, pos_y):
         super().__init__(tiles_group, all_sprites)
         self.add(bonus_group)
-        self.image = global_peremen.load_image('slow.png')
+        self.image = pygame.transform.scale(global_peremen.load_image('slow.png'), (tile_width, tile_height))
         self.rect = self.image.get_rect().move(
             tile_width * pos_x, tile_height * pos_y)
         self.used = False
