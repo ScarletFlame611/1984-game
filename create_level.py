@@ -263,7 +263,7 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
             self.used = False
-            self.sound = pygame.mixer.Sound('data\HILL.mp3')
+            self.sound = pygame.mixer.Sound('data/HILL.mp3')
             self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
@@ -289,7 +289,7 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + player_enemy_height // 3, tile_height * pos_y + player_enemy_height // 6)
             self.used = False
-            self.sound = pygame.mixer.Sound('data\COIN.mp3')
+            self.sound = pygame.mixer.Sound('data/COIN.mp3')
             self.sound.set_volume(global_peremen.volume * 3)
 
         def update(self):
@@ -320,10 +320,10 @@ try:
             self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2,
                                                     global_peremen.HIGH // 2, self.win)
             self.player_start_cd = 20
-            self.step = pygame.mixer.Sound("data\SHAG.mp3")
+            self.step = pygame.mixer.Sound("data/SHAG.mp3")
             self.step.set_volume(global_peremen.volume * 3)
             self.cd_step = 0
-            self.lazer = pygame.mixer.Sound('data\LAZER.mp3')
+            self.lazer = pygame.mixer.Sound('data/LAZER.mp3')
             self.lazer.set_volume(global_peremen.volume * 3)
 
         def load_level(self, filename):
@@ -665,7 +665,7 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + keys_coins_width // 3, tile_height * (pos_y + 1) - (keys_coins_height - (keys_coins_height // 3)))
             self.used = False
-            self.sound = pygame.mixer.Sound('data\TRAP.mp3')
+            self.sound = pygame.mixer.Sound('data/TRAP.mp3')
             self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
@@ -684,7 +684,7 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + keys_coins_width // 3, tile_height * pos_y + keys_coins_height // 6)
             self.used = False
-            self.sound = pygame.mixer.Sound('data\KEY.mp3')
+            self.sound = pygame.mixer.Sound('data/KEY.mp3')
             self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
@@ -703,7 +703,7 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + keys_coins_width // 4, tile_height * pos_y + keys_coins_height // 5)
             self.used = False
-            self.sound = pygame.mixer.Sound('data\TOOL.mp3')
+            self.sound = pygame.mixer.Sound('data/TOOL.mp3')
             self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
@@ -723,7 +723,7 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
             self.used = False
-            self.sound = pygame.mixer.Sound('data\LUK.mp3')
+            self.sound = pygame.mixer.Sound('data/LUK.mp3')
             self.sound.set_volume(global_peremen.volume * 3)
 
         def open(self, other):
@@ -744,7 +744,7 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
             self.used = False
-            self.sound = pygame.mixer.Sound('data\SAFE.mp3')
+            self.sound = pygame.mixer.Sound('data/SAFE.mp3')
             self.sound.set_volume(global_peremen.volume * 3)
 
         def open(self, other):
@@ -894,7 +894,7 @@ try:
         def back(self):
             global_peremen.in_game_menu.mod = 'menu'
             global_peremen.MOD = "in_game_menu"
-            global_peremen.music_now = 'data\MENU.mp3'
+            global_peremen.music_now = 'data/MENU.mp3'
             self.pause = False
             self.delete_level()
 

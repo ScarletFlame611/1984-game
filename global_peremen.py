@@ -27,7 +27,7 @@ try:
     levels = {}
     index = None
     music = None
-    music_now = 'data\MENU.mp3'
+    music_now = 'data/MENU.mp3'
     volume = 0.03
 
 
