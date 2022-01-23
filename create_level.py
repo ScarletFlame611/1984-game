@@ -44,7 +44,7 @@ try:
     def setup():
         global FPS, v, start_frame, amount_of_frames, frames_per_second, all_sprites, tiles_group, player_group, wall_group, bonus_group, enemies_group, borders_group, coins, for_open, enemies, bar_x, bar_y, EVENTS, level_name, player_image, tile_images, player_enemy_height, player_enemy_width, keys_coins_width, keys_coins_height
         FPS = 60
-        v = 4  # скорость игрока
+        v = round(min(global_peremen.WIDTH, global_peremen.HIGH) / 150) # скорость игрока
         start_frame = time.time()
         amount_of_frames = 8
         frames_per_second = 8  # обновление кадров для анимации бега
@@ -263,15 +263,18 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
             self.used = False
+            self.sound = pygame.mixer.Sound('data\HILL.mp3')
+            self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
             if not self.used and other.hp < other.max_hp:
+                self.sound.play()
                 other.hp += 30
                 self.used = True
                 color = pygame.Color(100, 100, 100)
                 colorImage = pygame.Surface(self.image.get_size()).convert_alpha()
                 colorImage.fill(color)
-                pygame.transform.scale(self.image, (tile_width, tile_height)).blit(colorImage, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
+                self.image.blit(colorImage, (0, 0), special_flags=pygame.BLEND_RGBA_MULT)
 
 
     class Coin(pygame.sprite.Sprite):
@@ -286,16 +289,19 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + player_enemy_height // 3, tile_height * pos_y + player_enemy_height // 6)
             self.used = False
+            self.sound = pygame.mixer.Sound('data\COIN.mp3')
+            self.sound.set_volume(global_peremen.volume * 3)
 
         def update(self):
             amount_of_frames = 6
             self.cur_frame = int(
                 (time.time() - start_frame) * frames_per_second % amount_of_frames)
-            self.image = self.frames[self.cur_frame]
+            self.image = pygame.transform.scale(self.frames[self.cur_frame], (keys_coins_width, keys_coins_height))
             self.used = False
 
         def buff(self, other):
             if not self.used:
+                self.sound.play()
                 other.score += 300
                 self.used = True
                 self.remove(coins)
@@ -659,9 +665,12 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + keys_coins_width // 3, tile_height * (pos_y + 1) - (keys_coins_height - (keys_coins_height // 3)))
             self.used = False
+            self.sound = pygame.mixer.Sound('data\TRAP.mp3')
+            self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
             if not self.used:
+                self.sound.play()
                 other.hp -= 10
                 self.image = pygame.transform.scale(global_peremen.load_image('trap2.png'), (keys_coins_width, keys_coins_height))
                 self.rect.y -= (keys_coins_height // 3)
@@ -675,9 +684,12 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + keys_coins_width // 3, tile_height * pos_y + keys_coins_height // 6)
             self.used = False
+            self.sound = pygame.mixer.Sound('data\KEY.mp3')
+            self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
             if not self.used:
+                self.sound.play()
                 other.keys += 1
                 self.used = True
                 self.remove(bonus_group)
@@ -691,9 +703,12 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x + keys_coins_width // 4, tile_height * pos_y + keys_coins_height // 5)
             self.used = False
+            self.sound = pygame.mixer.Sound('data\TOOL.mp3')
+            self.sound.set_volume(global_peremen.volume * 3)
 
         def buff(self, other):
             if not self.used:
+                self.sound.play()
                 other.instruments += 1
                 self.used = True
                 self.remove(bonus_group)
@@ -708,9 +723,12 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
             self.used = False
+            self.sound = pygame.mixer.Sound('data\LUK.mp3')
+            self.sound.set_volume(global_peremen.volume * 3)
 
         def open(self, other):
             if other.instruments > 0 and not self.used:
+                self.sound.play()
                 self.used = True
                 other.score += 100
                 other.instruments -= 1
@@ -726,9 +744,12 @@ try:
             self.rect = self.image.get_rect().move(
                 tile_width * pos_x, tile_height * pos_y)
             self.used = False
+            self.sound = pygame.mixer.Sound('data\SAFE.mp3')
+            self.sound.set_volume(global_peremen.volume * 3)
 
         def open(self, other):
             if other.keys > 0 and not self.used:
+                self.sound.play()
                 self.used = True
                 other.score += 1000
                 other.keys -= 1
@@ -747,7 +768,7 @@ try:
         def buff(self, other):
             global v
             if not self.used:
-                v += 2
+                v += (v // 2)
                 self.used = True
 
 
@@ -763,7 +784,7 @@ try:
         def buff(self, other):
             global v
             if not self.used:
-                v -= 2
+                v -= (v // 2)
                 self.used = True
 
 
