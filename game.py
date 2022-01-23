@@ -8,6 +8,7 @@ import fight
 import saves
 import choice_menu
 import settings
+import particles
 
 try:
     def play():
@@ -66,3 +67,19 @@ try:
             play()
 except in_game_menu.In_game_menu_error as er:
     print(f'ошибка: {er.__class__}')
+except global_peremen.Global_peremen_error as er:
+    print(f'ошибка: {er.__class__}')
+except settings.Setting_error as er:
+    print(f'ошибка: {er.__class__}')
+except choice_menu.Choice_menu_error as er:
+    print(f'ошибка: {er.__class__}')
+except create_level.Create_level_error as er:
+    print(f'ошибка: {er.__class__}')
+except menu.Menu_error as er:
+    print(f'ошибка: {er.__class__}')
+except particles.Particles_error as er:
+    print(f'ошибка: {er.__class__}')
+except saves.Saves_error as er:
+    print(f'ошибка: {er.__class__}')
+finally:
+    print('До свидания')
