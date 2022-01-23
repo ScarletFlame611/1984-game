@@ -91,7 +91,7 @@ class Player(pygame.sprite.Sprite):
         self.keys = 0
         self.instruments = 0
         self.is_start = False
-        self.damag_k = 100
+        self.damag_k = 25
 
     # передаются координаты сдвига игрока и направление движения
     # (0-вправо, 1 - влево, -1 - остановка)
@@ -308,6 +308,11 @@ class Level:
         self.win_button = global_peremen.Button('WIN', global_peremen.WIDTH // 2,
                                                 global_peremen.HIGH // 2, self.win)
         self.player_start_cd = 20
+        self.step = pygame.mixer.Sound("data\SHAG.mp3")
+        self.step.set_volume(global_peremen.volume * 3)
+        self.cd_step = 0
+        self.lazer = pygame.mixer.Sound('data\LAZER.mp3')
+        self.lazer.set_volume(global_peremen.volume * 3)
 
     def load_level(self, filename):
         global level_name
@@ -373,6 +378,8 @@ class Level:
         global EVENTS
         EVENTS = events
         global_peremen.screen.fill(pygame.Color(0, 0, 255))
+        if self.cd_step:
+            self.cd_step -= 1
         if global_peremen.MOD == "fight_start":
             for enemy in enemies:
                 if enemy.in_fight:
@@ -387,6 +394,7 @@ class Level:
             if event.type == pygame.KEYDOWN and global_peremen.MOD == "fight":
                 if event.key == pygame.K_k:
                     self.fight.attack('k', 5, 1)
+                    self.lazer.play()
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_ESCAPE:
                     ui.menu_esc()
@@ -397,6 +405,10 @@ class Level:
         else:
             if global_peremen.MOD == "play":
                 keys = pygame.key.get_pressed()
+                if (keys[pygame.K_LEFT] or keys[pygame.K_RIGHT] or keys[pygame.K_UP] or keys[pygame.K_DOWN]) and not self.cd_step:
+                    print('here')
+                    self.step.play()
+                    self.cd_step = 20
                 if keys[pygame.K_LEFT]:
                     self.player.update([-v, 0], 1)
                     self.steps_particles(-10)
@@ -858,6 +870,7 @@ class UI:
     def back(self):
         global_peremen.in_game_menu.mod = 'menu'
         global_peremen.MOD = "in_game_menu"
+        global_peremen.music_now = 'data\MENU.mp3'
         self.pause = False
         self.delete_level()
 

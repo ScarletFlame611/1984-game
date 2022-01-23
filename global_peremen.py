@@ -1,3 +1,5 @@
+class Global_peremen_error(Exception):
+    pass
 import pygame, os
 import sys, random
 
@@ -20,6 +22,9 @@ run = True
 new_game = True
 levels = {}
 index = None
+music = None
+music_now = 'data\MENU.mp3'
+volume = 0.03
 
 
 def load_image(name, colorkey=None):
