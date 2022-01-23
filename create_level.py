@@ -97,7 +97,7 @@ try:
             self.keys = 0
             self.instruments = 0
             self.is_start = False
-            self.damag_k = 40
+            self.damag_k = 30
 
         # передаются координаты сдвига игрока и направление движения
         # (0-вправо, 1 - влево, -1 - остановка)
@@ -223,8 +223,8 @@ try:
         def motion(self, x, y):
             self.rect.x = x * tile_width + 10
             self.rect.y = y * tile_height + 5
-            play_x = self.rect.x // tile_width
-            play_y = self.rect.y // tile_height
+            play_x = round(self.rect.x / tile_width)
+            play_y = round(self.rect.y / tile_height)
             self.cords = (play_x, play_y)
 
 
@@ -479,8 +479,8 @@ try:
             y = global_peremen.HIGH // tile_height
             self.create_lab()
             self.w, self.h = len(self.level[0]), len(self.level)
-            play_x = self.player.rect.x // tile_width
-            play_y = self.player.rect.y // tile_height
+            play_x = round(self.player.rect.x / tile_width)
+            play_y = round(self.player.rect.y / tile_height)
             self.player_cords = (play_x, play_y)
             self.player.rect.x = play_x * tile_width + 10
             self.player.rect.y = play_y * tile_height + 5
