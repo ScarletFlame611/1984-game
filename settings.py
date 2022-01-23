@@ -24,6 +24,15 @@ try:
             self.scroll.update(events)
             self.close.render(global_peremen.screen, events)
             result = self.input.update(events)
+            if self.mod == 'Size':
+                font = global_peremen.font.render('Size. Format - (1000 700)', True, (255, 255, 255))
+                global_peremen.screen.blit(font, (0, global_peremen.HIGH - font.get_height()))
+            elif self.mod == 'fps':
+                font = global_peremen.font.render('FPS. Format - 60', True, (255, 255, 255))
+                global_peremen.screen.blit(font, (0, global_peremen.HIGH - font.get_height()))
+            elif self.mod == 'volume':
+                font = global_peremen.font.render('Volume. Format - 70(0-100)', True, (255, 255, 255))
+                global_peremen.screen.blit(font, (0, global_peremen.HIGH - font.get_height()))
             if result:
                 if self.mod == 'Size':
                     if len(result.split()) == 2 and result.split()[0].isdigit() and result.split()[1].isdigit():
