@@ -309,5 +309,5 @@ try:
     def enter_name(poz, size, random_name_button=True, max_count_symbols=10):
         global enter_nam
         enter_nam = Name_input(poz, size, random_name_button, max_count_symbols)
-except:
+except Exception:
     raise Global_peremen_error()

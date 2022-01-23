@@ -68,5 +68,5 @@ try:
             global_peremen.MOD = "level" + str(num)
             global_peremen.music_now = 'Data\LEVEL.mp3'
             self.mod = "menu"
-except:
+except Exception:
     raise In_game_menu_error()

@@ -60,5 +60,5 @@ try:
         fires = [load_image(elem, colorkey=-1) for elem in fires]
         for _ in range(particle_count):
             Particle(position, random.choice(numbers), random.choice(numbers), fires, scales)
-except:
+except Exception:
     raise Particles_error()

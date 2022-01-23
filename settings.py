@@ -56,5 +56,5 @@ try:
 
 
     settings = Settings()
-except:
+except Exception:
     raise Setting_error()

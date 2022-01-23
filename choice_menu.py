@@ -63,5 +63,5 @@ try:
                     global_peremen.in_game_menu = in_game_menu.In_game_menu('bg.png', 'player.png', 'map.png')
                 else:
                     print('нету такого сохранения')
-except:
+except Exception:
     raise Choice_menu_error()

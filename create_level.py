@@ -912,5 +912,5 @@ try:
 
 
     ui = UI()
-except:
+except Exception:
     raise Create_level_error()

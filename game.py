@@ -81,5 +81,5 @@ except particles.Particles_error as er:
     print(f'ошибка: {er.__class__}')
 except saves.Saves_error as er:
     print(f'ошибка: {er.__class__}')
-finally:
-    print('До свидания')
+except Exception as er:
+    print(f'Неизвестная ошибка: {er.__class__}')

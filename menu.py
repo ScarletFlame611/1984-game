@@ -71,5 +71,5 @@ try:
                         btn.mouse_on(screen)
     '''
     menu = Menu()
-except:
+except Exception:
     raise Menu_error()

@@ -45,5 +45,5 @@ try:
     def clear():
         with open('data\saves.txt', 'w', newline=''):
             pass
-except:
+except Exception:
     raise Saves_error()
